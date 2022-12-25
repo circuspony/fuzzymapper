@@ -1,0 +1,65 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+html,
+body,
+#__next {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  flex-direction: column;
+  justify-items: space-between;
+  display: flex;
+  height: calc((var(--vh, 1vh) * 100));
+  font-family: "Montserrat";
+  color: "#FFFFFD";
+  background-color: rgb(245 243 255);
+}
+body::-webkit-scrollbar {
+  width: 0px;
+}
+body::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 0px transparent;
+}
+body::-webkit-scrollbar-thumb {
+  height: 0px;
+  width: 0px;
+  border-radius: 8px;
+  border: 0px solid transparent;
+  background-clip: content-box;
+  background-color: transparent;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+.c {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+.sc::-webkit-scrollbar {
+    width: 0.75em;
+    background-color: transparent;
+
+  }
+.sc::-webkit-scrollbar-track { 
+  background-color: transparent;
+    
+}
+.sc::-webkit-scrollbar-thumb {
+    height: 56px;
+    border-radius: 8px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    background-color: rgb(88 28 135);
+}
