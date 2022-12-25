@@ -51,7 +51,8 @@ const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFu
     useEffect(() => {
         update()
     }, [functionSets])
-
+    console.log("DICK")
+    console.log(process.env.NODE_ENV)
     return (
         <>
             <div className="text-lg text-violet-border mt-4 font-bold mb-1">{functionSets.title}</div>
