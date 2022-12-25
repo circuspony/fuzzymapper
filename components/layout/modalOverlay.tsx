@@ -23,7 +23,7 @@ const ModalOverlay = ({ children, modalOpen, setModalOpen, classes = '' }) => {
                 }
             }}
             ref={modalOverlayRef}
-            className={`${modalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            className={`opacity-0 ${modalOpen ? "opacity-100 pointer-events-auto" : "pointer-events-none"
                 } h-full fixed top-0 left-0 z-50 bg-black bg-opacity-50 w-full overflow-y-auto flex justify-center transition-opacity duration-500`}
         >
             <div
