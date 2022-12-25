@@ -16,7 +16,7 @@ const RegressionCard = ({ regression, title = true }) => {
                 <div className=" mb-1">{"Коэффициент Фишера: " + regression.F}</div>
                 <div className="relative z-10 mb-1">{"P-значение: " + regression.p}</div>
                 <div className="relative z-10 mb-1">{"Коэффициент детерминации: " + regression.r2}</div>
-                <img className="w-30 z-0 relative -mt-8 -ml-8" src={"http://localhost:5000/" + regression.fname} />
+                <img className="w-30 z-0 relative -mt-8 -ml-8" src={`${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000"}/${regression.fname}`} />
 
             </div>
         </>

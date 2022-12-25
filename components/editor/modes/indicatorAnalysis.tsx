@@ -41,6 +41,7 @@ const IndicatorAnalysis = ({ objectData, indicators }) => {
                     <>
                         <div className="relative">
                             <div className="border-violet-light border-4 absolute top-0 w-full h-full"></div>
+
                             <img src={`${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000"}/${corr}`} />
                         </div>
                     </> :
