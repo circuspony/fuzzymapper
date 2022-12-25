@@ -56,7 +56,7 @@ const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFu
         <>
             <div className="text-lg text-violet-border mt-4 font-bold mb-1">{functionSets.title}</div>
             <div className="text-lg text-violet-border mb-1">{"Индикатор:" + functionSets.name}</div>
-            {/* {graph.length ? <img className="w-30" src={process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000" + "/" + graph} /> : null} */}
+            {graph.length ? <img className="w-30" src={process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000" + "/" + graph} /> : null}
             <div onClick={() => { setShowMore(!showMore) }} className="cursor-pointer">{showMore ? "▲ Подробнее" : "▼ Подробнее"}</div>
             {showMore ? <>
                 <span className="mt-2">{"Соответствие: " + functionSets.coef}</span>
