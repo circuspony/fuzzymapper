@@ -101,7 +101,7 @@ const FactorEditor = ({
                                 </div>
                             </div>
                             {getFilteredfactorData()[currentFEditor]?.isExternal ?
-                                <div className="flex flex-col">
+                                <div className="flex flex-col sc">
                                     <div className="text-lg mt-4 font-bold mb-1">Метод оценки</div>
                                     <div className="flex text-lg">
                                         <div className="flex items-center">

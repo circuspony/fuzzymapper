@@ -72,7 +72,15 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         setUniqueCreationNumber(uniqueCreationNumber + 1)
     }
     const addIndicator = (factorId, indicator) => {
-        const factorIndex = factorData.filter(f => f !== null).findIndex((factor) => factor?.id === factorId)
+        const factorIndex = factorData.findIndex((factor) => {
+            if (factor) {
+                if (factor?.id === factorId) {
+                    return true
+                }
+                return false
+            }
+            return false
+        })
         if (factorIndex >= 0) {
             const newIndicatorData = {
                 name: indicator.title,
@@ -477,7 +485,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                 />
             </div>
             <div
-                className={`${currentWindow === EDITOR_WINDOWS.FACTORS ? "flex" : "hidden"}`}>
+                className={`${currentWindow === EDITOR_WINDOWS.FACTORS ? "flex sc overflow-scroll " : "hidden"}`}>
                 <FactorEditor
                     factorData={factorData}
                     setFactorData={setFactorData}

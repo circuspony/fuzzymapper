@@ -9,6 +9,11 @@ const MEMBERSHIP = {
     TRAPEZOID: 1
 }
 
+const OUTLIER = {
+    NO_OUTLIER: 0,
+    LOW_OUTLIER: 1,
+    HIGH_OUTLIER: 2
+}
 const FuzzyMode = ({
     factorData,
     factorConnectionData,
@@ -30,6 +35,9 @@ const FuzzyMode = ({
 
     const [step, setStep] = useState(1);
     const [readyFunctionSets, setFunctionSets] = useState([]);
+    const [outlier, setOutlier] = useState(false);
+    const [lowOutlier, setLowOutlier] = useState("Малый выброс");
+    const [highOutlier, setHighOutlier] = useState("Большой выброс");
 
     const checkExternalEvals = () => {
         let exconnected = factorConnectionData.filter(fc => fc.end === factor.id).filter(fc => getFactorById(fc.start).isExternal)
@@ -99,46 +107,75 @@ const FuzzyMode = ({
 
 
 
-    const createStandardFunctionSets = (objectData) => {
+    const createStandardFunctionSets = async (objectDataNew) => {
+        const response = await backendAxios.post("/outlier", {
+            data: objectDataNew
+        })
+        objectDataNew = response.data.objectSet
         let indicators = factor?.indicators.filter(i => i !== null)
         let indicatorsMaxMin = indicators.map((indicator, index) => {
-            let object = objectData.find(o => o.title === indicator.name)
-            return { ...indicator, max: Math.max(...object.values.map(v => v.value)), min: Math.min(...object.values.map(v => v.value)) }
+            let object = objectDataNew.find(o => o.title === indicator.name)
+            return { ...indicator, outlier: outlier, max: Math.max(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)), min: Math.min(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)) }
         })
+
         let stFunctionSets = indicatorsMaxMin.map(indicator => {
-            return { ...indicator, functionSets: generateTriFunc(indicator.min, indicator.max, terms), values: objectData.find(o => o.title === indicator.name).values }
+            let o = objectDataNew.find(o => o.title === indicator.name)
+            return { ...indicator, functionSets: generateTriFunc(indicator.min, indicator.max, terms), values: o.values, ol15: o.ol15, oh15: o.oh15, ol30: o.ol30, oh30: o.oh30 }
         })
         return stFunctionSets
     }
 
-    const getExternalEvalSets = () => {
-        let objectsIndexed = objectData.map(o => ({ ...o, values: o.values.map((v, i) => ({ key: i, value: v })) }))
+    const getExternalEvalSets = async () => {
+        let objectsIndexed = objectData.map(o => ({ ...o, values: o.values.map((v, i) => ({ key: i, value: v, outlier: OUTLIER.NO_OUTLIER })) }))
         let exconnected = factorConnectionData.filter(fc => fc.end === factor.id).filter(fc => getFactorById(fc.start).isExternal)
         let exevals = factorEvals.filter(fd => exconnected.findIndex(ex => ex.start === fd.id) >= 0)
         if (exevals.length) {
             let evalSet = []
-            exevals.forEach((ev, ei) => {
+
+            for (let ei = 0; ei < exevals.length; ei++) {
+                let ev = exevals[ei]
                 let evalLabels = ev.labels.map(l => {
                     let max = Math.max(...l)
                     return l.indexOf(max)
                 })
-                ev.eLabels.forEach((l, li) => {
+
+                for (let li = 0; li < ev.eLabels.length; li++) {
+                    let l = ev.eLabels[li]
                     // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
                     let newArray = objectsIndexed.map(o => ({
                         ...o, values: o.values.filter((v, i) => {
                             return ev.labels[i][li] > 0
                         })
                     })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
-                    let newSet = createStandardFunctionSets(newArray).map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
+
+                    let newSet = await createStandardFunctionSets(newArray)
+
+                    newSet = newSet.map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
                     evalSet = [...evalSet, ...newSet]
-                })
-            })
+                }
+
+                // ev.eLabels.forEach(async (l, li) => {
+                //     // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
+                //     let newArray = objectsIndexed.map(o => ({
+                //         ...o, values: o.values.filter((v, i) => {
+                //             return ev.labels[i][li] > 0
+                //         })
+                //     })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
+
+                //     let newSet = await createStandardFunctionSets(newArray)
+
+                //     newSet = newSet.map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
+                //     evalSet = [...evalSet, ...newSet]
+                // })
+            }
             setFunctionSets(evalSet)
         }
         else {
-            let standardSets = createStandardFunctionSets(objectsIndexed).map(s => ({ ...s, title: "Стандратная", type: MEMBERSHIP.TRIANGLE, external: false }))
+            let standardSets = await createStandardFunctionSets(objectsIndexed)
+            standardSets = standardSets.map(s => ({ ...s, title: "Стандратная", type: MEMBERSHIP.TRIANGLE, external: false }))
             setFunctionSets(standardSets)
         }
+        setStep(3)
     }
 
 
@@ -150,7 +187,7 @@ const FuzzyMode = ({
         })
         const newEval = {
             id: factor.id,
-            eLabels: termNames,
+            eLabels: outlier ? [lowOutlier, ...termNames, highOutlier] : termNames,
             labels: response.data.evals.map(e => e.mv)
         }
         let feCopy = [...factorEvals]
@@ -163,7 +200,8 @@ const FuzzyMode = ({
         }
         setFactorEvals(feCopy)
     }
-
+    console.log("readyFunctionSets")
+    console.log(readyFunctionSets)
     return (
         <>
             <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
@@ -180,12 +218,23 @@ const FuzzyMode = ({
                 className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
             />
             {factor?.indicators.filter(i => i !== null).length && checkExternalEvals() ? <>
+
+                <div className="flex items-center mt-2 ">
+                    <div
+                        onClick={() => {
+                            setOutlier(!outlier)
+                        }}
+                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
+                    <span>Учесть выбросы</span>
+                </div>
                 <div
                     onClick={() => {
                         setTermNames(Array.from(Array(terms).keys()))
+                        setLowOutlier("Меньше 0")
+                        setHighOutlier("Больше " + (terms - 1))
                         setStep(2)
                     }}
-                    className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                    className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                     Принять
                 </div>
             </> : <>Не хватает данных для расчета
@@ -210,12 +259,38 @@ const FuzzyMode = ({
                             className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
                         />
                     )}
+
+                    {outlier ? <>
+                        <span className="mt-2">Имена категорий выбросов</span>
+                        <input
+                            key={"lotinput"}
+                            value={lowOutlier}
+                            onChange={(e) => {
+                                setLowOutlier(e.target.value)
+
+                            }}
+                            style={{
+                                outline: "none",
+                            }}
+                            className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
+                        />
+                        <input
+                            key={"hotinput"}
+                            value={highOutlier}
+                            onChange={(e) => {
+                                setHighOutlier(e.target.value)
+                            }}
+                            style={{
+                                outline: "none",
+                            }}
+                            className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
+                        />
+                    </> : <></>}
                     <div
-                        onClick={() => {
-                            setStep(3)
-                            getExternalEvalSets()
+                        onClick={async () => {
+                            await getExternalEvalSets()
                         }}
-                        className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                        className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                         Принять
                     </div>
                 </>
@@ -243,7 +318,7 @@ const FuzzyMode = ({
                             setStep(4)
                             getEval()
                         }}
-                        className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                        className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                         Рассчитать оценку
                     </div>
                 </>

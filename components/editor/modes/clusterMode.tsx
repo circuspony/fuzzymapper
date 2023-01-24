@@ -14,6 +14,7 @@ const ClusterMode = ({
     factor,
     factorEvals,
     setFactorEvals, }) => {
+    const [outlier, setOutlier] = useState(false);
     const [cmethod, setCmethod] = useState(CMETH.CM);
 
     const formatEvalsWithIndicatorsClusters = (labels, indicators) => {
@@ -42,16 +43,19 @@ const ClusterMode = ({
             let feildObj = objectData.find(field => field.title === indicator.name)
             data.push(feildObj.values)
         });
+        console.log("data")
+        console.log(data)
         const response = await backendAxios.post("/clusters", {
             clusters: clusters,
             data: data,
+            outlier: outlier,
             cmethod: cmethod
         })
         const updateData = {
             id: factor.id,
             labels: formatEvalsWithIndicatorsClusters(response.data.labels, factor.indicators),
             centers: response.data.centers,
-            eLabels: Array.from(Array(clusters).keys())
+            eLabels: outlier ? ["Меньшие выбросы", ...Array.from(Array(clusters).keys()), "Большие выбросы"] : Array.from(Array(clusters).keys())
         }
         let newFactorEvals = [...factorEvals]
         let findex = newFactorEvals.findIndex((f) => f.id === factor.id)
@@ -100,11 +104,19 @@ const ClusterMode = ({
                 className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
             />
             {factor?.indicators.filter(i => i !== null).length ? <>
+                <div className="flex items-center mt-2 ">
+                    <div
+                        onClick={() => {
+                            setOutlier(!outlier)
+                        }}
+                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
+                    <span>Учесть выбросы</span>
+                </div>
                 <div
                     onClick={() => {
                         getClusters()
                     }}
-                    className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                    className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                     Рассчитать
                 </div>
             </> : <>Не хватает данных для расчета</>}

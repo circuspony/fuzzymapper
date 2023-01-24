@@ -143,7 +143,7 @@ const FactorObject = ({
                         className={`bg-transparent border-0 p-4 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
                     />
                     {currentWindow === "analysis" && factorEvals.findIndex(fe => fe.id === factorData.id) >= 0 ?
-                        <div className="absolute font-bold w-full pt-2 pb-3 bottom-0 px-4">
+                        <div className="absolute text-xs font-bold w-full pt-2 pb-3 bottom-0 px-4">
                             <span className="">{getEvalString()}</span>
                         </div>
                         : null}

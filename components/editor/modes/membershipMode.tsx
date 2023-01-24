@@ -103,14 +103,14 @@ const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFu
                     onClick={() => {
                         updateFsWithInputs()
                     }}
-                    className={`h-16 mt-2  justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                    className={`h-16 mt-2  justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                     Обновить
                 </div>
                 <div
                     onClick={() => {
                         updateFsWithAuto()
                     }}
-                    className={`h-16 mt-2 ml-4 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                    className={`h-16 mt-2 ml-4 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                     Сгенерировать
                 </div>
 

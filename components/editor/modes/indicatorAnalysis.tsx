@@ -4,9 +4,9 @@ import backendAxios from '../../network/backend'
 
 
 const IndicatorAnalysis = ({ objectData, indicators }) => {
-    const [corr, setCorr] = useState("");
+    const [corr, setCorr] = useState([]);
 
-    useEffect(() => { setCorr('') }, [indicators])
+    useEffect(() => { setCorr([]) }, [indicators])
 
     const getAnalysis = async () => {
         let fi = indicators.filter(i => i !== null)
@@ -37,13 +37,23 @@ const IndicatorAnalysis = ({ objectData, indicators }) => {
                         Рассчитать
                     </div>
                 </> : <>Не хватает индикаторов для расчета</>}
-                {corr.length ?
+                {corr.length && corr.length === indicators.filter(i => i !== null).length ?
                     <>
-                        <div className="relative">
-                            <div className="border-violet-light border-4 absolute top-0 w-full h-full"></div>
-
-                            <img src={`${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000"}/${corr}`} />
+                        <div className="flex text-sm mt-8">
+                            <div className="flex w-48"></div>
+                            {indicators.filter(i => i !== null).map(ind => {
+                                return <div className="font-bold flex w-48 mr-3">{ind.name}</div>
+                            })
+                            }
                         </div>
+                        {indicators.filter(i => i !== null).map((ind, i) => {
+                            return <div className="flex my-2 items-center">
+                                <div className="font-bold text-sm flex w-48 mr-3">{ind.name}</div>
+                                {corr[i].map(c => <div className="flex w-48">{c.toFixed(4)}</div>)
+                                }
+                            </div>
+                        })
+                        }
                     </> :
                     <></>}
             </div>
