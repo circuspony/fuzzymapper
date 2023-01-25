@@ -32,14 +32,14 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
             outlier: factorEvals.find(fe => fe.id === factorS.id).outlier,
             cmethod: "CM"
         })
-        const responsePCA = await backendAxios.post("/pca", {
-            data: {
-                fsi: datafs,
-                fei: data,
-                reverseX: false,
-                reverseY: false,
-            }
-        })
+        // const responsePCA = await backendAxios.post("/pca", {
+        //     data: {
+        //         fsi: datafs,
+        //         fei: data,
+        //         reverseX: false,
+        //         reverseY: false,
+        //     }
+        // })
         const response2 = await backendAxios.post("/clustercomp", {
             clusters: clusters,
             data: {
@@ -48,14 +48,8 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
             }
         })
         setMatrix(response2.data.matrix)
-        setResult(response2.data.result.map(a => {
-            if (responsePCA.data.regression.b >= 0) return a
-            else return -a
-        }))
-        setEval(response2.data.result.map(a => {
-            if (responsePCA.data.regression.b >= 0) return a
-            else return -a
-        }))
+        setResult(response2.data.result)
+        setEval(response2.data.result)
     }
     return (
         <>
