@@ -29,7 +29,8 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
         const response1 = await backendAxios.post("/clusters", {
             clusters: clusters,
             data: data,
-            cmethod: "GK"
+            outlier: factorEvals.find(fe => fe.id === factorS.id).outlier,
+            cmethod: "CM"
         })
         const responsePCA = await backendAxios.post("/pca", {
             data: {
@@ -92,7 +93,7 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
                     </div>
                     {matrix?.map((m, mi) =>
                         <div className="flex">
-                            <div className="items-center flex w-40 h-full">{factorEvals?.find(fe => fe.id === factorS.id)?.eLabels[mi]}</div>
+                            <div className="items-center font-medium flex w-40 h-full">{factorEvals?.find(fe => fe.id === factorS.id)?.eLabels[mi]}</div>
                             {
                                 m.map((mm) =>
                                     <div className="items-center flex w-40 h-full">{mm.toFixed(4)}</div>

@@ -53,6 +53,7 @@ const ClusterMode = ({
         })
         const updateData = {
             id: factor.id,
+            outlier: outlier,
             labels: formatEvalsWithIndicatorsClusters(response.data.labels, factor.indicators),
             centers: response.data.centers,
             eLabels: outlier ? ["Меньшие выбросы", ...Array.from(Array(clusters).keys()), "Большие выбросы"] : Array.from(Array(clusters).keys())

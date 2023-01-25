@@ -23,8 +23,12 @@ const FactorEditor = ({
     factorConnectionEvals,
     setFactorConnectionEvals }) => {
     const changeFactorData = (factorIndex, newFactorData) => {
+        const searched = getFilteredfactorData()[factorIndex]
         setFactorData(factorData.map((factorData, index) => {
-            if (index === factorIndex) {
+            if (factorData === null) {
+                return factorData
+            }
+            if (searched.id === factorData.id) {
                 return { ...factorData, ...newFactorData }
             }
             return factorData
@@ -87,6 +91,7 @@ const FactorEditor = ({
                                     <div
                                         onClick={() => {
                                             changeFactorData(currentFEditor, { isExternal: true })
+                                            setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
                                         }}
                                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${getFilteredfactorData()[currentFEditor]?.isExternal ? "bg-green-500" : ""}`}></div>
                                     <span>Внешний</span>
@@ -95,6 +100,8 @@ const FactorEditor = ({
                                     <div
                                         onClick={() => {
                                             changeFactorData(currentFEditor, { isExternal: false })
+                                            setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
+
                                         }}
                                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${!getFilteredfactorData()[currentFEditor]?.isExternal ? "bg-violet" : ""}`}></div>
                                     <span>Управляемый</span>

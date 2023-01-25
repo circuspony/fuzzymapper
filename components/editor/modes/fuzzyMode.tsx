@@ -195,7 +195,11 @@ const FuzzyMode = ({
             setFunctionSets(evalSet)
         }
         else {
-            let standardSets = await createStandardFunctionSets(objectsIndexed)
+
+            const response = await backendAxios.post("/outlier", {
+                data: [objectsIndexed]
+            })
+            let standardSets = createStandardFunctionSets(response.data.objectSet[0])
             standardSets = standardSets.map(s => ({ ...s, title: "Стандратная", type: MEMBERSHIP.TRIANGLE, external: false }))
             setFunctionSets(standardSets)
         }
@@ -204,13 +208,12 @@ const FuzzyMode = ({
 
 
     const getEval = async () => {
-        console.log("readyFunctionSets")
-        console.log(readyFunctionSets)
         const response = await backendAxios.post("/fuzzy", {
             data: readyFunctionSets
         })
         const newEval = {
             id: factor.id,
+            outlier: outlier,
             eLabels: outlier ? [lowOutlier, ...termNames, highOutlier] : termNames,
             labels: response.data.evals.map(e => e.mv)
         }
@@ -224,8 +227,6 @@ const FuzzyMode = ({
         }
         setFactorEvals(feCopy)
     }
-    console.log("readyFunctionSets")
-    console.log(readyFunctionSets)
     return (
         <>
             <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
