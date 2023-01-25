@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react"
 import axios from 'axios'
 import backendAxios from '../../network/backend'
+import * as V from 'victory';
+import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis } from 'victory';
 
 const MEMBERSHIP = {
     TRIANGLE: 0,
@@ -8,7 +10,7 @@ const MEMBERSHIP = {
 }
 const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFunc }) => {
     const [showMore, setShowMore] = useState(false);
-    const [graph, setGraph] = useState("");
+    const [graph, setGraph] = useState([]);
     const [fsType, setFsType] = useState(functionSets?.type ? functionSets.type : null);
     const [inputs, setinputs] = useState(functionSets?.functionSets ? functionSets.functionSets.map(fs => fs.join(",")) : null);
     const updateFsWithInputs = () => {
@@ -34,18 +36,40 @@ const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFu
         if (functionSets?.functionSets.length) {
             setFsType(functionSets.type)
             setinputs(functionSets?.functionSets ? functionSets.functionSets.map(fs => fs.join(",")) : null)
-            if (functionSets.type === MEMBERSHIP.TRIANGLE) {
-                const response = await backendAxios.post("/triangle", {
-                    data: functionSets.functionSets
-                })
-                setGraph(response.data.fname)
+            setGraph(functionSets?.functionSets.map(fs => `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`))
+            // if (functionSets.type === MEMBERSHIP.TRIANGLE) {
+            //     const response = await backendAxios.post("/triangle", {
+            //         data: functionSets.functionSets
+            //     })
+            //     setGraph(response.data.fname)
+            // }
+            // if (functionSets.type === MEMBERSHIP.TRAPEZOID) {
+            //     const response = await backendAxios.post("/trapezoid", {
+            //         data: functionSets.functionSets
+            //     })
+            //     setGraph(response.data.fname)
+            // }
+        }
+    }
+    const getXYObject = (fs, left = false, right = false) => {
+        if (functionSets.type === MEMBERSHIP.TRIANGLE) {
+            if (left) {
+                return [{ x: fs[0], y: 1 }, { x: fs[1], y: 1 }, { x: fs[2], y: 0 }]
             }
-            if (functionSets.type === MEMBERSHIP.TRAPEZOID) {
-                const response = await backendAxios.post("/trapezoid", {
-                    data: functionSets.functionSets
-                })
-                setGraph(response.data.fname)
+            if (right) {
+                return [{ x: fs[0], y: 0 }, { x: fs[1], y: 1 }, { x: fs[2], y: 1 }]
             }
+            return [{ x: fs[0], y: 0 }, { x: fs[1], y: 1 }, { x: fs[2], y: 0 }]
+        }
+        if (functionSets.type === MEMBERSHIP.TRAPEZOID) {
+            if (left) {
+                return [{ x: fs[0], y: 1 }, { x: fs[1], y: 1 }, { x: fs[2], y: 1 }, { x: fs[3], y: 0 }]
+            }
+            if (right) {
+                return [{ x: fs[0], y: 0 }, { x: fs[1], y: 1 }, { x: fs[2], y: 1 }, { x: fs[3], y: 1 }]
+            }
+            return [{ x: fs[0], y: 0 }, { x: fs[1], y: 1 }, { x: fs[2], y: 1 }, { x: fs[3], y: 0 }]
+
         }
     }
     useEffect(() => {
@@ -55,7 +79,42 @@ const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFu
         <>
             <div className="text-lg text-violet-border mt-4 font-bold mb-1">{functionSets.title}</div>
             <div className="text-lg text-violet-border mb-1">{"Индикатор:" + functionSets.name}</div>
-            {graph.length ? <img className="w-30" src={`${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000"}/${graph}`} /> : null}
+            {/* {graph.length ? <img className="w-30" src={`${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_FLASK : "http://localhost:5000"}/${graph}`} /> : null} */}
+            <div style={{ maxWidth: "600px" }}>
+                <VictoryChart
+                    height={300}
+                    width={450}
+                    theme={VictoryTheme.material}
+                >
+                    <VictoryAxis
+                        style={{
+                            axisLabel: { fontSize: 12 },
+                            tickLabels: { fontSize: 12, padding: 5 }
+                        }}
+                        orientation="bottom"
+                    />
+
+                    <VictoryAxis dependentAxis
+                        style={{
+                            axisLabel: { fontSize: 12 },
+                            tickLabels: { fontSize: 12, padding: 5 }
+                        }}
+                        orientation="left"
+
+                    />
+
+                    {functionSets?.functionSets.map((fs, fsi) =>
+                        <VictoryLine
+                            style={{
+                                data: { stroke: graph[fsi] },
+                                parent: { border: "1px solid #ccc" }
+                            }}
+                            data={getXYObject(fs, fsi === 0, fsi === (functionSets.functionSets.length - 1))}
+                        />)}
+
+                </VictoryChart>
+            </div>
+
             <div onClick={() => { setShowMore(!showMore) }} className="cursor-pointer">{showMore ? "▲ Подробнее" : "▼ Подробнее"}</div>
             {showMore ? <>
                 <span className="mt-2">{"Соответствие: " + functionSets.coef}</span>
