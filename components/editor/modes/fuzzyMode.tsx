@@ -107,11 +107,8 @@ const FuzzyMode = ({
 
 
 
-    const createStandardFunctionSets = async (objectDataNew) => {
-        const response = await backendAxios.post("/outlier", {
-            data: objectDataNew
-        })
-        objectDataNew = response.data.objectSet
+    const createStandardFunctionSets = (objectDataNew) => {
+
         let indicators = factor?.indicators.filter(i => i !== null)
         let indicatorsMaxMin = indicators.map((indicator, index) => {
             let object = objectDataNew.find(o => o.title === indicator.name)
@@ -131,43 +128,70 @@ const FuzzyMode = ({
         let exevals = factorEvals.filter(fd => exconnected.findIndex(ex => ex.start === fd.id) >= 0)
         if (exevals.length) {
             let evalSet = []
+            let objectsWithExt = []
 
             for (let ei = 0; ei < exevals.length; ei++) {
                 let ev = exevals[ei]
-                let evalLabels = ev.labels.map(l => {
-                    let max = Math.max(...l)
-                    return l.indexOf(max)
-                })
-
                 for (let li = 0; li < ev.eLabels.length; li++) {
                     let l = ev.eLabels[li]
-                    // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
                     let newArray = objectsIndexed.map(o => ({
                         ...o, values: o.values.filter((v, i) => {
                             return ev.labels[i][li] > 0
                         })
                     })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
-
-                    let newSet = await createStandardFunctionSets(newArray)
-
-                    newSet = newSet.map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
-                    evalSet = [...evalSet, ...newSet]
+                    if (newArray[0].values.length) {
+                        objectsWithExt.push({
+                            l: l,
+                            ev: ev,
+                            array: newArray
+                        })
+                    }
                 }
-
-                // ev.eLabels.forEach(async (l, li) => {
-                //     // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
-                //     let newArray = objectsIndexed.map(o => ({
-                //         ...o, values: o.values.filter((v, i) => {
-                //             return ev.labels[i][li] > 0
-                //         })
-                //     })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
-
-                //     let newSet = await createStandardFunctionSets(newArray)
-
-                //     newSet = newSet.map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
-                //     evalSet = [...evalSet, ...newSet]
-                // })
             }
+            const response = await backendAxios.post("/outlier", {
+                data: objectsWithExt.map(owe => owe.array)
+            })
+            objectsWithExt = objectsWithExt.map((owe, i) => { return { ...owe, array: response.data.objectSet[i] } })
+            for (let owe of objectsWithExt) {
+                console.log(owe)
+
+                let newSet = createStandardFunctionSets(owe.array)
+
+                newSet = newSet.map(s => ({ ...s, title: getFactorById(owe.ev.id).name + " " + owe.l, type: MEMBERSHIP.TRIANGLE, external: true }))
+                evalSet = [...evalSet, ...newSet]
+            }
+            // for (let ei = 0; ei < exevals.length; ei++) {
+            //     let ev = exevals[ei]
+            //     let evalLabels = ev.labels.map(l => {
+            //         let max = Math.max(...l)
+            //         return l.indexOf(max)
+            //     })
+            //     for (let li = 0; li < ev.eLabels.length; li++) {
+            //         let l = ev.eLabels[li]
+            //         // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
+            //         let newArray = objectsIndexed.map(o => ({
+            //             ...o, values: o.values.filter((v, i) => {
+            //                 return ev.labels[i][li] > 0
+            //             })
+            //         })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
+
+            //     }
+
+            //     // ev.eLabels.forEach(async (l, li) => {
+            //     //     // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
+            //     //     let newArray = objectsIndexed.map(o => ({
+            //     //         ...o, values: o.values.filter((v, i) => {
+            //     //             return ev.labels[i][li] > 0
+            //     //         })
+            //     //     })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
+
+            //     //     let newSet = await createStandardFunctionSets(newArray)
+
+            //     //     newSet = newSet.map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
+            //     //     evalSet = [...evalSet, ...newSet]
+            //     // })
+            // }
+
             setFunctionSets(evalSet)
         }
         else {
