@@ -6,6 +6,7 @@ import backendAxios from '../../network/backend'
 const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE }) => {
     const [clusters, setClusters] = useState(2);
     const [matrix, setMatrix] = useState([]);
+    const [outlier, setOutlier] = useState(false);
     const [result, setResult] = useState([]);
     useEffect(() => {
         setClusters(2)
@@ -29,7 +30,7 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
         const response1 = await backendAxios.post("/clusters", {
             clusters: clusters,
             data: data,
-            outlier: factorEvals.find(fe => fe.id === factorS.id).outlier,
+            outlier: outlier,
             cmethod: "CM"
         })
         // const responsePCA = await backendAxios.post("/pca", {

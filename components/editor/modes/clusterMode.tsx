@@ -111,7 +111,7 @@ const ClusterMode = ({
                             setOutlier(!outlier)
                         }}
                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
-                    <span>Учесть выбросы</span>
+                    <span>Обработать выбросы</span>
                 </div>
                 <div
                     onClick={() => {
