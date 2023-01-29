@@ -302,7 +302,7 @@ const EditorSidebar = ({
                         Меню редактора
                     </a>
                 </Link> */}
-                <input className="hidden" id="fileLoader" type="file" onChange={handleChange} />
+                <input className="hidden" value={null} id="fileLoader" type="file" onChange={handleChange} />
                 <input
                     className="hidden"
                     onChange={handleFileChange}

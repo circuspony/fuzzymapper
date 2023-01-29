@@ -205,13 +205,6 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
     }
 
     const [files, setFiles] = useState(null);
-    const handleChange = e => {
-        const fileReader = new FileReader();
-        fileReader.readAsText(e.target.files[0], "UTF-8");
-        fileReader.onload = e => {
-            setFiles(e.target.result);
-        };
-    };
     const getSavingData = () => {
         return factorData.map((factor) => {
             if (factor) {
@@ -385,6 +378,16 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         return factorConnection.influence
     }
 
+    const handleChange = e => {
+        console.log(666)
+        const fileReader = new FileReader();
+        fileReader.readAsText(e.target.files[0], "UTF-8");
+        fileReader.onload = e => {
+            setFiles(e.target.result);
+        };
+        let input = document.getElementById("fileLoader") as HTMLInputElement
+        input.value = null
+    };
     const exportFile = async () => {
         const savingData = getSavingData()
         let myData = {
@@ -415,6 +418,8 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         if (files?.length) {
             const loadedFile = JSON.parse(files)
             if (loadedFile) {
+                console.log(6665)
+                console.log(loadedFile.factors)
                 setFactorData(loadedFile.factors)
                 setFactorConnectionData(loadedFile.connections)
                 setUniqueCreationNumber(loadedFile.idGen)
@@ -425,7 +430,8 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
             setFiles(null)
         }
     }, [files])
-
+    console.log("factorData")
+    console.log(factorData)
     return (
         <>
             <EditorSidebar
