@@ -5,11 +5,14 @@ import FuzzyMode from "./modes/fuzzyMode"
 import IndicatorAnalysis from "./modes/indicatorAnalysis"
 import RegressionMode from "./modes/regressionMode"
 import ClusterComparison from "./modes/clusterComparison"
+import AccumulatorMode from "./modes/accumulatorMode"
+import { fchmod } from "fs"
 
 const METHODS = {
     REGRESSION: 0,
     CLUSTERING: 1,
-    EXPERT: 2,
+    ACCUMULATOR: 2,
+    EXPERT: 3,
 }
 
 const FactorConnectionEditor = ({
@@ -41,10 +44,29 @@ const FactorConnectionEditor = ({
         }
     }
     useEffect(() => {
-
         setMethod(null)
         setCurrentEval([])
     }, [currentFСEditor])
+    const trace = (fe) => {
+        let wayFound = false
+        let ways = [[factorConnectionData[currentFСEditor].start, factorConnectionData[currentFСEditor].end]]
+        while (!wayFound) {
+            let newWays = []
+            for (let way of ways) {
+                let beginNodes = factorConnectionData.filter(fc => fc.start === way[way.length - 1])
+                for (let ends of beginNodes) {
+                    if (ends.end === fe.id) {
+                        wayFound = true
+                    }
+                    let newWay = [...way, ends.end]
+                    newWays.push(newWay)
+                }
+            }
+            ways = newWays
+        }
+        return ways
+
+    }
     const [method, setMethod] = useState(null);
     const [currentEval, setCurrentEval] = useState([]);
 
@@ -54,7 +76,44 @@ const FactorConnectionEditor = ({
     const setRegEval = (ev) => {
         changeFactorConnectionInfluence(currentFСEditor, "?", [ev])
     }
+    const setChainEvals = (ev, fe) => {
+        const currentTrace = trace(fe)
+        let neededTrace = currentTrace.find(t => t[t.length - 1] === fe.id)
+        let top = ev
+        for (let t = neededTrace.length - 1; t > 0; t--) {
+            let neededTraceIndex = factorConnectionData.findIndex(fc => fc.start === neededTrace[t - 1] && fc.end === neededTrace[t])
+            let num = 1
+            if (t !== neededTrace.length - 1) {
+                num = ev / top
+            }
+            else {
+                if (factorConnectionData[neededTraceIndex].fcEval.filter(f => !Number.isNaN(f)).length) {
+                    if (Math.abs(factorConnectionData[neededTraceIndex].fcEval[0]) < Math.abs(ev)) {
+                        top = ev
+                        num = top
+                    }
+                    else {
+                        top = factorConnectionData[neededTraceIndex].fcEval[0]
+                        num = top
+                    }
+                }
+                else {
+                    top = ev
+                    num = top
+                }
+                num = top
+            }
+            if (factorConnectionData[neededTraceIndex].fcEval.filter(f => !Number.isNaN(f)).length) {
+                if (Math.abs(factorConnectionData[neededTraceIndex].fcEval[0]) < Math.abs(num)) {
+                    changeFactorConnectionInfluence(neededTraceIndex, "?", [num])
+                }
+            }
+            else {
+                changeFactorConnectionInfluence(neededTraceIndex, "?", [num])
+            }
 
+        }
+    }
     return (
         <>
             {factorConnectionData.filter(f => f !== null).length ?
@@ -87,6 +146,15 @@ const FactorConnectionEditor = ({
                                 <div
                                     onClick={() => {
                                         updateExpertEvals()
+                                        setMethod(METHODS.ACCUMULATOR)
+                                    }}
+                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
+                                <span>Аккумуляция</span>
+                            </div>
+                            <div className="flex ml-2 items-center">
+                                <div
+                                    onClick={() => {
+                                        updateExpertEvals()
                                         setMethod(METHODS.EXPERT)
                                     }}
                                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.EXPERT ? "bg-blue-500" : ""}`}></div>
@@ -109,6 +177,15 @@ const FactorConnectionEditor = ({
                                 factorEvals={factorEvals}
                                 factorS={getFactorById(factorConnectionData[currentFСEditor].start)}
                                 factorE={getFactorById(factorConnectionData[currentFСEditor].end)}
+                            />
+                        </> : null}
+
+                        {method === METHODS.ACCUMULATOR ? <>
+                            <AccumulatorMode
+                                setEval={setChainEvals}
+                                objectData={objectData}
+                                factorData={factorData}
+                                factorS={getFactorById(factorConnectionData[currentFСEditor].start)}
                             />
                         </> : null}
                         {method === METHODS.EXPERT ?
