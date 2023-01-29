@@ -104,7 +104,7 @@ const FactorConnectionEditor = ({
                 num = top
             }
             if (factorConnectionData[neededTraceIndex].fcEval.filter(f => !Number.isNaN(f)).length) {
-                if (Math.abs(factorConnectionData[neededTraceIndex].fcEval[0]) < Math.abs(num)) {
+                if (Math.abs(factorConnectionData[neededTraceIndex].fcEval[0]) < Math.abs(num) || t === 1) {
                     changeFactorConnectionInfluence(neededTraceIndex, "?", [num])
                 }
             }

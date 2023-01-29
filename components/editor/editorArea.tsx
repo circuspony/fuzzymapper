@@ -307,17 +307,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
             setProjectId(response.data.data.neededDoc._id)
         }
     }
-    // useEffect(() => {
-    //     if (files?.length) {
-    //         const loadedFile = JSON.parse(files)
-    //         if (loadedFile) {
-    //             setFactorData(loadedFile.factors)
-    //             setFactorConnectionData(loadedFile.connections)
-    //             setUniqueCreationNumber(loadedFile.idGen)
-    //         }
-    //         setFiles(null)
-    //     }
-    // }, [files])
+
     const refreshData = async () => {
         const response = await axios.get(`/api/getProject?id=${projectId}`)
         setProjectName(response.data.data.neededDoc.name)
@@ -325,6 +315,9 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         setFactorConnectionData(response.data.data.neededDoc.connections)
         setUniqueCreationNumber(response.data.data.neededDoc.idGen)
     }
+
+
+
     useEffect(() => {
         if (projectId !== "") {
             refreshData()
@@ -391,6 +384,48 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         }
         return factorConnection.influence
     }
+
+    const exportFile = async () => {
+        const savingData = getSavingData()
+        let myData = {
+            factors: savingData,
+            idGen: uniqueCreationNumber,
+            connections: factorConnectionData,
+            factorEvals: factorEvals,
+            factorConnectionEvals: factorConnectionEvals,
+            objectData: objectData
+        }
+        const fileName = "mapFile";
+        const json = JSON.stringify(myData, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const href = URL.createObjectURL(blob);
+
+        // create "a" HTLM element with href to file
+        const link = document.createElement("a");
+        link.href = href;
+        link.download = fileName + ".json";
+        document.body.appendChild(link);
+        link.click();
+
+        // clean up "a" element & remove ObjectURL
+        document.body.removeChild(link);
+        URL.revokeObjectURL(href);
+    }
+    useEffect(() => {
+        if (files?.length) {
+            const loadedFile = JSON.parse(files)
+            if (loadedFile) {
+                setFactorData(loadedFile.factors)
+                setFactorConnectionData(loadedFile.connections)
+                setUniqueCreationNumber(loadedFile.idGen)
+                setFactorEvals(loadedFile.factorEvals)
+                setFactorConnectionEvals(loadedFile.factorConnectionEvals)
+                setObjectData(loadedFile.objectData)
+            }
+            setFiles(null)
+        }
+    }, [files])
+
     return (
         <>
             <EditorSidebar
@@ -406,6 +441,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                 EDITOR_WINDOWS={EDITOR_WINDOWS}
                 isSubMap={isSubMap}
                 closeASubMap={closeASubMap}
+                exportFile={exportFile}
                 saveFile={saveFile}
                 setObjectData={setObjectData}
                 addField={addField}

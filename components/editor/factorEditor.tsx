@@ -2,12 +2,14 @@ import { useEffect, useState, useRef } from "react"
 import ModalOverlay from "../layout/modalOverlay"
 import ClusterMode from "./modes/clusterMode"
 import FuzzyMode from "./modes/fuzzyMode"
+import AccumulateFuzzyMode from "./modes/accumulateFuzzyMode"
 import IndicatorAnalysis from "./modes/indicatorAnalysis"
 import EvalTable from "./modes/evalTable"
 
 const METHODS = {
     CLUSTERING: 0,
-    FUZZY: 1
+    FUZZY: 1,
+    ACCUMULATOR: 2
 }
 
 const FactorEditor = ({
@@ -138,19 +140,47 @@ const FactorEditor = ({
                             {!getFilteredfactorData()[currentFEditor]?.isExternal ?
                                 <div className="flex flex-col">
                                     <div className="text-lg mt-4 font-bold mb-1">Метод оценки</div>
-                                    <div className="flex text-lg">
-                                        <div className="flex items-center">
-                                            <div
-                                                onClick={() => {
-                                                    setMethod(method === METHODS.FUZZY ? null : METHODS.FUZZY)
-                                                }}
-                                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.FUZZY ? "bg-red-500" : ""}`}></div>
-                                            <span>Фаззификация</span>
+                                    <div className="flex">
+                                        <div className="flex text-lg">
+                                            <div className="flex items-center">
+                                                <div
+                                                    onClick={() => {
+                                                        setMethod(method === METHODS.FUZZY ? null : METHODS.FUZZY)
+                                                    }}
+                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.FUZZY ? "bg-red-500" : ""}`}></div>
+                                                <span>Фаззификация</span>
+                                            </div>
                                         </div>
+                                        {/* <div className="ml-2 flex text-lg">
+                                            <div className="flex items-center">
+                                                <div
+                                                    onClick={() => {
+                                                        setMethod(method === METHODS.ACCUMULATOR ? null : METHODS.ACCUMULATOR)
+                                                    }}
+                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
+                                                <span>Аккумуляция</span>
+                                            </div>
+                                        </div> */}
                                     </div>
                                     {method === METHODS.FUZZY ?
                                         <>
                                             <FuzzyMode
+                                                objectData={objectData}
+                                                factorData={factorData}
+                                                factorConnectionData={factorConnectionData}
+                                                terms={terms}
+                                                setTerms={setTerms}
+                                                termNames={termNames}
+                                                setTermNames={setTermNames}
+                                                factor={getFilteredfactorData()[currentFEditor]}
+                                                factorEvals={factorEvals}
+                                                setFactorEvals={setFactorEvals} />
+                                        </>
+                                        : <></>}
+
+                                    {method === METHODS.ACCUMULATOR ?
+                                        <>
+                                            <AccumulateFuzzyMode
                                                 objectData={objectData}
                                                 factorData={factorData}
                                                 factorConnectionData={factorConnectionData}

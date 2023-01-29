@@ -11,7 +11,7 @@ const EditorSidebar = ({
     projectId,
     setOpenRename,
     objectData,
-
+    exportFile,
     handleChange,
     addFactor,
     currentWindow,
@@ -279,6 +279,18 @@ const EditorSidebar = ({
                                 Редактировать проект
                             </div>
                         }
+                        <div
+                            onClick={() => { exportFile() }}
+                            className="mx-auto mt-auto font-medium hover:cursor-pointer hover:text-yellow-500"
+                        >
+                            Экспортировать
+                        </div>
+                        <div
+                            onClick={() => { document.getElementById("fileLoader").click() }}
+                            className="mx-auto mt-2 mb-4 font-medium hover:cursor-pointer hover:text-yellow-500"
+                        >
+                            Импортировать
+                        </div>
                         {/* <div
                                 onClick={uploadFile}
                                 className={`h-16 relative noselect z-40 transition-all duration-300 mt-4 mx-auto items-center flex px-16 cursor-pointer text-white font-medium bg-violet-border hover:bg-violet-dark  border-2 border-violet border-dotted rounded-xl `}>
