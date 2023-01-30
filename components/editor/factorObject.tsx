@@ -134,7 +134,7 @@ const FactorObject = ({
                             outline: "none",
                             resize: "none",
                             height: (height) ? height + 'px' : 'auto',
-                            minHeight: '40px'
+                            minHeight: '55px'
                         }}
                         onBlur={() => {
                             setInputActive(false)
