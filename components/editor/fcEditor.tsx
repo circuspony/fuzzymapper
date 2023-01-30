@@ -28,7 +28,8 @@ const FactorConnectionEditor = ({
     setFactorEvals,
     factorConnectionEvals,
     setFactorConnectionEvals,
-    changeFactorConnectionInfluence
+    changeFactorConnectionInfluence,
+    setFactorConnectionData
 }) => {
 
     const getFactorById = (id) => {
@@ -80,6 +81,7 @@ const FactorConnectionEditor = ({
         const currentTrace = trace(fe)
         let neededTrace = currentTrace.find(t => t[t.length - 1] === fe.id)
         let top = ev
+        let factorConnectionDataNew = [...factorConnectionData]
         for (let t = neededTrace.length - 1; t > 0; t--) {
             let neededTraceIndex = factorConnectionData.findIndex(fc => fc.start === neededTrace[t - 1] && fc.end === neededTrace[t])
             let num = 1
@@ -105,14 +107,25 @@ const FactorConnectionEditor = ({
             }
             if (factorConnectionData[neededTraceIndex].fcEval.filter(f => !Number.isNaN(f)).length) {
                 if (Math.abs(factorConnectionData[neededTraceIndex].fcEval[0]) < Math.abs(num) || t === 1) {
-                    changeFactorConnectionInfluence(neededTraceIndex, "?", [num])
+                    factorConnectionDataNew = factorConnectionDataNew.map((fc, fci) => {
+                        if (fci === neededTraceIndex) {
+                            return { ...fc, fcEval: [num] }
+                        }
+                        return fc
+                    })
                 }
             }
             else {
-                changeFactorConnectionInfluence(neededTraceIndex, "?", [num])
+                factorConnectionDataNew = factorConnectionDataNew.map((fc, fci) => {
+                    if (fci === neededTraceIndex) {
+                        return { ...fc, fcEval: [num] }
+                    }
+                    return fc
+                })
             }
 
         }
+        setFactorConnectionData(factorConnectionDataNew)
     }
     return (
         <>

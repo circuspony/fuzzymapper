@@ -558,6 +558,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                     factorConnectionEvals={factorConnectionEvals}
                     setFactorConnectionEvals={setFactorConnectionEvals}
                     changeFactorConnectionInfluence={changeFactorConnectionInfluence}
+                    setFactorConnectionData={setFactorConnectionData}
                 />
             </div>
             <EditorMenu

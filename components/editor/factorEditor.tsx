@@ -151,7 +151,7 @@ const FactorEditor = ({
                                                 <span>Фаззификация</span>
                                             </div>
                                         </div>
-                                        {/* <div className="ml-2 flex text-lg">
+                                        <div className="ml-2 flex text-lg">
                                             <div className="flex items-center">
                                                 <div
                                                     onClick={() => {
@@ -160,7 +160,7 @@ const FactorEditor = ({
                                                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
                                                 <span>Аккумуляция</span>
                                             </div>
-                                        </div> */}
+                                        </div>
                                     </div>
                                     {method === METHODS.FUZZY ?
                                         <>
