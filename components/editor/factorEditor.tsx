@@ -141,26 +141,33 @@ const FactorEditor = ({
                                 <div className="flex flex-col">
                                     <div className="text-lg mt-4 font-bold mb-1">Метод оценки</div>
                                     <div className="flex">
-                                        <div className="flex text-lg">
-                                            <div className="flex items-center">
-                                                <div
-                                                    onClick={() => {
-                                                        setMethod(method === METHODS.FUZZY ? null : METHODS.FUZZY)
-                                                    }}
-                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.FUZZY ? "bg-red-500" : ""}`}></div>
-                                                <span>Фаззификация</span>
+                                        {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length ? <>
+
+                                            <div className="flex mr-2 text-lg">
+                                                <div className="flex items-center">
+                                                    <div
+                                                        onClick={() => {
+                                                            setMethod(method === METHODS.FUZZY ? null : METHODS.FUZZY)
+                                                        }}
+                                                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.FUZZY ? "bg-red-500" : ""}`}></div>
+                                                    <span>Фаззификация</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="ml-2 flex text-lg">
-                                            <div className="flex items-center">
-                                                <div
-                                                    onClick={() => {
-                                                        setMethod(method === METHODS.ACCUMULATOR ? null : METHODS.ACCUMULATOR)
-                                                    }}
-                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
-                                                <span>Аккумуляция</span>
+                                        </> : <></>}
+                                        {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length === 0 ? <>
+
+                                            <div className="flex text-lg">
+                                                <div className="flex items-center">
+                                                    <div
+                                                        onClick={() => {
+                                                            setMethod(method === METHODS.ACCUMULATOR ? null : METHODS.ACCUMULATOR)
+                                                        }}
+                                                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
+                                                    <span>Аккумуляция</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </> : <></>}
+                                        { }
                                     </div>
                                     {method === METHODS.FUZZY ?
                                         <>

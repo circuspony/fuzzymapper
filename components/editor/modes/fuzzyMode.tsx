@@ -114,7 +114,6 @@ const FuzzyMode = ({
             let object = objectDataNew.find(o => o.title === indicator.name)
             return { ...indicator, outlier: outlier, max: Math.max(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)), min: Math.min(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)) }
         })
-
         let stFunctionSets = indicatorsMaxMin.map(indicator => {
             let o = objectDataNew.find(o => o.title === indicator.name)
             return { ...indicator, functionSets: generateTriFunc(indicator.min, indicator.max, terms), values: o.values, ol15: o.ol15, oh15: o.oh15, ol30: o.ol30, oh30: o.oh30 }
@@ -153,7 +152,6 @@ const FuzzyMode = ({
             })
             objectsWithExt = objectsWithExt.map((owe, i) => { return { ...owe, array: response.data.objectSet[i] } })
             for (let owe of objectsWithExt) {
-                console.log(owe)
 
                 let newSet = createStandardFunctionSets(owe.array)
 

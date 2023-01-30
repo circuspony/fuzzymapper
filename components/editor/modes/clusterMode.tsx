@@ -43,8 +43,6 @@ const ClusterMode = ({
             let feildObj = objectData.find(field => field.title === indicator.name)
             data.push(feildObj.values)
         });
-        console.log("data")
-        console.log(data)
         const response = await backendAxios.post("/clusters", {
             clusters: clusters,
             data: data,

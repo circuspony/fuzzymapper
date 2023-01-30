@@ -379,7 +379,6 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
     }
 
     const handleChange = e => {
-        console.log(666)
         const fileReader = new FileReader();
         fileReader.readAsText(e.target.files[0], "UTF-8");
         fileReader.onload = e => {
@@ -418,8 +417,6 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         if (files?.length) {
             const loadedFile = JSON.parse(files)
             if (loadedFile) {
-                console.log(6665)
-                console.log(loadedFile.factors)
                 setFactorData(loadedFile.factors)
                 setFactorConnectionData(loadedFile.connections)
                 setUniqueCreationNumber(loadedFile.idGen)
@@ -430,8 +427,6 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
             setFiles(null)
         }
     }, [files])
-    console.log("factorData")
-    console.log(factorData)
     return (
         <>
             <EditorSidebar

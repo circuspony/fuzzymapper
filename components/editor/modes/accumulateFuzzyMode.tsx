@@ -3,6 +3,7 @@ import axios from 'axios'
 import EvalTable from "./evalTable"
 import MembershipMode from "./membershipMode"
 import backendAxios from '../../network/backend'
+import { combineArrays, combineArrays2 } from '../../utils'
 import { rule } from "postcss"
 
 const MEMBERSHIP = {
@@ -15,103 +16,6 @@ const OUTLIER = {
     LOW_OUTLIER: 1,
     HIGH_OUTLIER: 2
 }
-
-function combineArrays(array_of_arrays) {
-
-    // First, handle some degenerate cases...
-
-    if (!array_of_arrays) {
-        // Or maybe we should toss an exception...?
-        return [];
-    }
-
-    if (!Array.isArray(array_of_arrays)) {
-        // Or maybe we should toss an exception...?
-        return [];
-    }
-
-    if (array_of_arrays.length == 0) {
-        return [];
-    }
-
-    for (let i = 0; i < array_of_arrays.length; i++) {
-        if (!Array.isArray(array_of_arrays[i]) || array_of_arrays[i].length == 0) {
-            // If any of the arrays in array_of_arrays are not arrays or zero-length, return an empty array...
-            return [];
-        }
-    }
-
-    // Done with degenerate cases...
-
-    // Start "odometer" with a 0 for each array in array_of_arrays.
-    let odometer = new Array(array_of_arrays.length);
-    odometer.fill(0);
-
-    let output = [];
-
-    let newCombination = formCombination(odometer, array_of_arrays);
-
-    output.push(newCombination);
-
-    while (odometer_increment(odometer, array_of_arrays)) {
-        newCombination = formCombination(odometer, array_of_arrays);
-        output.push(newCombination);
-    }
-
-    return output;
-}/* combineArrays() */
-
-
-// Translate "odometer" to combinations from array_of_arrays
-function formCombination(odometer, array_of_arrays) {
-    // In Imperative Programmingese (i.e., English):
-    // let s_output = "";
-    // for( let i=0; i < odometer.length; i++ ){
-    //    s_output += "" + array_of_arrays[i][odometer[i]]; 
-    // }
-    // return s_output;
-
-    // In Functional Programmingese (Henny Youngman one-liner):
-    return odometer.reduce(
-        function (accumulator, odometer_value, odometer_index) {
-            return "" + accumulator + array_of_arrays[odometer_index][odometer_value] + "++";
-        },
-        ""
-    );
-}/* formCombination() */
-
-function odometer_increment(odometer, array_of_arrays) {
-
-    // Basically, work you way from the rightmost digit of the "odometer"...
-    // if you're able to increment without cycling that digit back to zero,
-    // you're all done, otherwise, cycle that digit to zero and go one digit to the
-    // left, and begin again until you're able to increment a digit
-    // without cycling it...simple, huh...?
-
-    for (let i_odometer_digit = odometer.length - 1; i_odometer_digit >= 0; i_odometer_digit--) {
-
-        let maxee = array_of_arrays[i_odometer_digit].length - 1;
-
-        if (odometer[i_odometer_digit] + 1 <= maxee) {
-            // increment, and you're done...
-            odometer[i_odometer_digit]++;
-            return true;
-        }
-        else {
-            if (i_odometer_digit - 1 < 0) {
-                // No more digits left to increment, end of the line...
-                return false;
-            }
-            else {
-                // Can't increment this digit, cycle it to zero and continue
-                // the loop to go over to the next digit...
-                odometer[i_odometer_digit] = 0;
-                continue;
-            }
-        }
-    }/* for( let odometer_digit = odometer.length-1; odometer_digit >=0; odometer_digit-- ) */
-
-}/* odometer_increment() */
 
 const FuzzyMode = ({
     factorData,
@@ -208,100 +112,25 @@ const FuzzyMode = ({
 
     const createStandardFunctionSets = (objectDataNew) => {
 
-        let indicators = factor?.indicators.filter(i => i !== null)
-        let indicatorsMaxMin = indicators.map((indicator, index) => {
-            let object = objectDataNew.find(o => o.title === indicator.name)
-            return { ...indicator, outlier: outlier, max: Math.max(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)), min: Math.min(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)) }
-        })
-
+        let object = objectDataNew[0]
+        let indicatorsMaxMin = [{ name: "Предсказание", coef: 1, outlier: outlier, max: Math.max(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)), min: Math.min(...object.values.filter(v => v.outlier === OUTLIER.NO_OUTLIER || !outlier).map(v => v.value)) }]
         let stFunctionSets = indicatorsMaxMin.map(indicator => {
-            let o = objectDataNew.find(o => o.title === indicator.name)
+            let o = objectDataNew[0]
             return { ...indicator, functionSets: generateTriFunc(indicator.min, indicator.max, terms), values: o.values, ol15: o.ol15, oh15: o.oh15, ol30: o.ol30, oh30: o.oh30 }
         })
         return stFunctionSets
     }
 
     const getExternalEvalSets = async () => {
-        let objectsIndexed = objectData.map(o => ({ ...o, values: o.values.map((v, i) => ({ key: i, value: v, outlier: OUTLIER.NO_OUTLIER })) }))
-        let exconnected = factorConnectionData.filter(fc => fc.end === factor.id).filter(fc => getFactorById(fc.start).isExternal)
-        let exevals = factorEvals.filter(fd => exconnected.findIndex(ex => ex.start === fd.id) >= 0)
-        if (exevals.length) {
-            let evalSet = []
-            let objectsWithExt = []
 
-            for (let ei = 0; ei < exevals.length; ei++) {
-                let ev = exevals[ei]
-                for (let li = 0; li < ev.eLabels.length; li++) {
-                    let l = ev.eLabels[li]
-                    let newArray = objectsIndexed.map(o => ({
-                        ...o, values: o.values.filter((v, i) => {
-                            return ev.labels[i][li] > 0
-                        })
-                    })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
-                    if (newArray[0].values.length) {
-                        objectsWithExt.push({
-                            l: l,
-                            ev: ev,
-                            array: newArray
-                        })
-                    }
-                }
-            }
-            const response = await backendAxios.post("/outlier", {
-                data: objectsWithExt.map(owe => owe.array)
-            })
-            objectsWithExt = objectsWithExt.map((owe, i) => { return { ...owe, array: response.data.objectSet[i] } })
-            for (let owe of objectsWithExt) {
-                console.log(owe)
+        const response = await backendAxios.post("/outlier", {
+            data: [[{ title: "Предсказания", key: false, values: predictions.map((p, pi) => { return { key: pi, value: p, outlier: OUTLIER.NO_OUTLIER } }) }]]
+        })
+        let standardSets = createStandardFunctionSets(response.data.objectSet[0])
+        standardSets = standardSets.map(s => ({ ...s, title: "Стандратная", type: MEMBERSHIP.TRIANGLE, external: false }))
 
-                let newSet = createStandardFunctionSets(owe.array)
+        setFunctionSets(standardSets)
 
-                newSet = newSet.map(s => ({ ...s, title: getFactorById(owe.ev.id).name + " " + owe.l, type: MEMBERSHIP.TRIANGLE, external: true }))
-                evalSet = [...evalSet, ...newSet]
-            }
-            // for (let ei = 0; ei < exevals.length; ei++) {
-            //     let ev = exevals[ei]
-            //     let evalLabels = ev.labels.map(l => {
-            //         let max = Math.max(...l)
-            //         return l.indexOf(max)
-            //     })
-            //     for (let li = 0; li < ev.eLabels.length; li++) {
-            //         let l = ev.eLabels[li]
-            //         // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
-            //         let newArray = objectsIndexed.map(o => ({
-            //             ...o, values: o.values.filter((v, i) => {
-            //                 return ev.labels[i][li] > 0
-            //             })
-            //         })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
-
-            //     }
-
-            //     // ev.eLabels.forEach(async (l, li) => {
-            //     //     // let newArray = objectsIndexed.map(o => ({ ...o, values: o.values.filter((v, i) => evalLabels[i] == li) })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[i][li] })) }))
-            //     //     let newArray = objectsIndexed.map(o => ({
-            //     //         ...o, values: o.values.filter((v, i) => {
-            //     //             return ev.labels[i][li] > 0
-            //     //         })
-            //     //     })).map(o => ({ ...o, values: o.values.map((v, i) => ({ ...v, eval: ev.labels[v.key][li] })) }))
-
-            //     //     let newSet = await createStandardFunctionSets(newArray)
-
-            //     //     newSet = newSet.map(s => ({ ...s, title: getFactorById(ev.id).name + " " + l, type: MEMBERSHIP.TRIANGLE, external: true }))
-            //     //     evalSet = [...evalSet, ...newSet]
-            //     // })
-            // }
-
-            setFunctionSets(evalSet)
-        }
-        else {
-
-            const response = await backendAxios.post("/outlier", {
-                data: [objectsIndexed]
-            })
-            let standardSets = createStandardFunctionSets(response.data.objectSet[0])
-            standardSets = standardSets.map(s => ({ ...s, title: "Стандратная", type: MEMBERSHIP.TRIANGLE, external: false }))
-            setFunctionSets(standardSets)
-        }
         setStep(3)
     }
 
@@ -368,15 +197,31 @@ const FuzzyMode = ({
             return rule
         })
         setRulebase(newrulebase)
+    }
+    const [predictions, setPredictions] = useState([]);
+
+    const generatePredictions = async () => {
+        const newData = []
+        const currentInputs = factorConnectionData.filter(fc => fc.end === factor.id).map(fc => { return { ...fc, name: factorData.find(f => fc.start === f.id).name } })
+        currentInputs.forEach(ci => {
+            let feval = factorEvals.find(fe => fe.id === ci.start)
+            let fdata = factorData.find(f => f.id === ci.start)
+
+            fdata = {
+                ...fdata, fevals: feval.labels, labels: feval.eLabels, indicators: fdata.indicators.filter(i => i !== null).map(i => {
+                    return { ...i, values: objectData.find(o => o.title === i.name).values }
+                })
+            }
+            newData.push(fdata)
+        })
+        const response = await backendAxios.post("/accumulation", {
+            data: newData,
+            icombos: combineArrays2(newData.map(nd => nd.indicators)),
+            rulebase
+        })
+        setPredictions(response.data.predictions)
 
     }
-    console.log("factorConnectionData2222")
-    console.log(factorConnectionData)
-    console.log(factor)
-    console.log(factorData)
-    console.log(factorEvals)
-    console.log(objectData)
-
 
     return (
         <>
@@ -395,27 +240,27 @@ const FuzzyMode = ({
                     <div>{rulebase.map(r => <div>{r.text}</div>)}</div>
                     <div
                         onClick={() => {
-                            generateRules()
+                            generatePredictions()
                         }}
                         className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                         Получить предсказания
                     </div>
-                    <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
-                    <span>Число термов</span>
-                    <input
-                        value={terms}
-                        onChange={(e) => {
-                            setTerms(e.target.value.length ? parseInt(e.target.value) > 1 ? parseInt(e.target.value) : 2 : 2)
-
-                        }}
-                        style={{
-                            outline: "none",
-                        }}
-                        className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
-                    />
                 </>
                 : null}
-            {factor?.indicators.filter(i => i !== null).length && checkExternalEvals() ? <>
+            {predictions.filter(i => i !== null).length && checkExternalEvals() ? <>
+                <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
+                <span>Число термов</span>
+                <input
+                    value={terms}
+                    onChange={(e) => {
+                        setTerms(e.target.value.length ? parseInt(e.target.value) > 1 ? parseInt(e.target.value) : 2 : 2)
+
+                    }}
+                    style={{
+                        outline: "none",
+                    }}
+                    className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
+                />
 
                 <div className="flex items-center mt-2 ">
                     <div
@@ -435,8 +280,9 @@ const FuzzyMode = ({
                     className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                     Принять
                 </div>
-            </> : <>Не хватает данных для расчета
-                {checkExternalEvals() ? <></> : <div>Есть внешние факторы, которые не были оценены</div>}
+            </> : <>
+                {/* Не хватает данных для расчета
+                {checkExternalEvals() ? <></> : <div>Есть внешние факторы, которые не были оценены</div>} */}
             </>}
             {step >= 2 ?
                 <>

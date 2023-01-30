@@ -10,7 +10,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             const insertDoc = await collection.insertOne(req.body)
             const neededDoc = await collection.findOne({ _id: insertDoc.insertedId })
             res.status(200).json({ ok: true, data: { message: "worked", neededDoc: neededDoc } })
-            return 
+            return
         }
         if (req.method === "PUT") {
             const updateDoc = await collection.updateOne(
@@ -27,7 +27,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             return
         }
     } catch (error) {
-        console.log(error)
         res.status(204).json({ ok: false, data: { message: error.message } })
         return
     }
