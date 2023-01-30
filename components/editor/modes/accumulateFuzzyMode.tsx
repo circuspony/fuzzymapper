@@ -247,7 +247,7 @@ const FuzzyMode = ({
                     </div>
                 </>
                 : null}
-            {predictions.filter(i => i !== null).length && checkExternalEvals() ? <>
+            {predictions.filter(i => i !== null).length && factor && checkExternalEvals() ? <>
                 <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
                 <span>Число термов</span>
                 <input

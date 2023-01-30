@@ -57,7 +57,7 @@ const FactorEditor = ({
                     <div className="flex-col w-2/4 px-8 text-black ">
                         <div className="text-black mt-4 text-2xl font-bold mb-2">{getFilteredfactorData()[currentFEditor]?.name}</div>
                         <div className="flex-col">
-                            {factorConnectionData.filter(fc => fc.start === getFilteredfactorData()[currentFEditor].id).length ?
+                            {getFilteredfactorData()[currentFEditor] && factorConnectionData.filter(fc => fc.start === getFilteredfactorData()[currentFEditor].id).length ?
                                 <>
                                     <div className="text-lg mt-4 font-bold mb-1">Влияет на другие факторы</div>
                                     {factorConnectionData.filter(fc => fc.start === getFilteredfactorData()[currentFEditor].id).map((f, i) =>

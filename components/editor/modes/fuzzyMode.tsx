@@ -240,7 +240,7 @@ const FuzzyMode = ({
                 }}
                 className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
             />
-            {factor?.indicators.filter(i => i !== null).length && checkExternalEvals() ? <>
+            {factor?.indicators.filter(i => i !== null).length && factor && checkExternalEvals() ? <>
 
                 <div className="flex items-center mt-2 ">
                     <div
@@ -261,7 +261,7 @@ const FuzzyMode = ({
                     Принять
                 </div>
             </> : <>Не хватает данных для расчета
-                {checkExternalEvals() ? <></> : <div>Есть внешние факторы, которые не были оценены</div>}
+                {factor && checkExternalEvals() ? <></> : <div>Есть внешние факторы, которые не были оценены</div>}
             </>}
             {step >= 2 ?
                 <>
