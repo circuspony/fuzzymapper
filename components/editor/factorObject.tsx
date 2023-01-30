@@ -75,7 +75,7 @@ const FactorObject = ({
                     }}
                     onMouseEnter={() => { setIsHovered(true) }}
                     onMouseLeave={() => { setIsHovered(false) }}
-                    style={{ width: width, minHeight: height + 12 }}
+                    style={{ width: width, minHeight: height }}
                     className={`absolute flex-col  z-30 text-sm items-center flex cursor-pointer text-white  font-medium ${id === currentConnectId ? "bg-yellow-500" : currentConnectId !== null ? factorData.isExternal ? "bg-green-500 hover:bg-yellow-400" : "bg-violet hover:bg-yellow-400" : factorData.isExternal ? "bg-green-500" : "bg-violet"} border-2 border-dotted border-violet-border rounded-3xl top-28 left-0 mx-auto right-0 ${!inputActive && !indicatorActive ? "handle" : ""}`}>
                     {/* {factorData?.submap?.factors?.length ?
                         <div
@@ -128,7 +128,7 @@ const FactorObject = ({
                         spellCheck={false}
                         onChange={(e) => {
                             setInputInfo(e.target.value)
-                            setHeight(0)
+                            // setHeight(0)
                         }}
                         style={{
                             outline: "none",
