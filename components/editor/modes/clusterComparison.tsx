@@ -7,6 +7,7 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
     const [clusters, setClusters] = useState(2);
     const [matrix, setMatrix] = useState([]);
     const [outlier, setOutlier] = useState(false);
+    const [negative, setNegative] = useState(false);
     const [result, setResult] = useState([]);
     useEffect(() => {
         setClusters(2)
@@ -50,7 +51,7 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
         })
         setMatrix(response2.data.matrix)
         setResult(response2.data.result)
-        setEval(response2.data.result)
+        setEval(response2.data.result.map(r => negative ? -r : r))
     }
     return (
         <>
@@ -65,6 +66,14 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
                 }}
                 className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
             />
+            <div className="flex items-center mt-2 ">
+                <div
+                    onClick={() => {
+                        setNegative(!negative)
+                    }}
+                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${negative ? "bg-blue-500" : ""}`}></div>
+                <span>Отрицательное влияние</span>
+            </div>
             <div
                 onClick={() => {
                     getClusters()
