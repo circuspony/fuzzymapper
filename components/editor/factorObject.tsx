@@ -32,7 +32,7 @@ const FactorObject = ({
     const textAreaRef = useRef(null)
     const factorRef = useRef(null)
     const [width, setWidth] = useState(200);
-    const [height, setHeight] = useState(72)
+    const [height, setHeight] = useState(20)
 
     const [inputInfo, setInputInfo] = useState("");
     const [inputActive, setInputActive] = useState(false)
@@ -76,7 +76,7 @@ const FactorObject = ({
                     onMouseEnter={() => { setIsHovered(true) }}
                     onMouseLeave={() => { setIsHovered(false) }}
                     style={{ width: width, minHeight: height }}
-                    className={`absolute z-30 text-sm items-center flex cursor-pointer text-white  font-medium ${id === currentConnectId ? "bg-yellow-500" : currentConnectId !== null ? factorData.isExternal ? "bg-green-500 hover:bg-yellow-400" : "bg-violet hover:bg-yellow-400" : factorData.isExternal ? "bg-green-500" : "bg-violet"} border-2 border-dotted border-violet-border rounded-3xl top-28 left-0 mx-auto right-0 ${!inputActive && !indicatorActive ? "handle" : ""}`}>
+                    className={`absolute flex-col  z-30 text-sm items-center flex cursor-pointer text-white  font-medium ${id === currentConnectId ? "bg-yellow-500" : currentConnectId !== null ? factorData.isExternal ? "bg-green-500 hover:bg-yellow-400" : "bg-violet hover:bg-yellow-400" : factorData.isExternal ? "bg-green-500" : "bg-violet"} border-2 border-dotted border-violet-border rounded-3xl top-28 left-0 mx-auto right-0 ${!inputActive && !indicatorActive ? "handle" : ""}`}>
                     {/* {factorData?.submap?.factors?.length ?
                         <div
                             onClick={() => {
@@ -134,20 +134,22 @@ const FactorObject = ({
                             outline: "none",
                             resize: "none",
                             height: (height) ? height + 'px' : 'auto',
-                            minHeight: '72px'
+                            minHeight: '40px'
                         }}
                         onBlur={() => {
                             setInputActive(false)
                             changeFactorData({ name: inputInfo })
                         }}
-                        className={`bg-transparent border-0 p-4 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
+                        className={`bg-transparent border-0 p-4 pb-0 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
                     />
-                    {currentWindow === "analysis" && factorEvals.findIndex(fe => fe.id === factorData.id) >= 0 ?
-                        <div className="absolute text-xs font-bold w-full pt-2 pb-3 bottom-0 px-4">
-                            <span className="">{getEvalString()}</span>
-                        </div>
-                        : null}
+                    <div style={{ minHeight: "1rem" }} className=" text-xs font-bold w-full pt-1.5 pb-3 bottom-0 px-3">
 
+                        {currentWindow === "analysis" && factorEvals.findIndex(fe => fe.id === factorData.id) >= 0 ?
+                            <span className="">{getEvalString()}</span>
+
+                            : <div style={{ minHeight: "12px" }} className=""></div>
+                        }
+                    </div>
                     {factorData.indicators.map((indicatorData, indicatorIndex) =>
                         <>
                             <IndicatorObject

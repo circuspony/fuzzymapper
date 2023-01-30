@@ -129,15 +129,15 @@ const FactorConnectionEditor = ({
     }
     return (
         <>
-            {factorConnectionData.filter(f => f !== null).length ?
+            {factorConnectionData.filter(f => f !== null).length && getFactorById(factorConnectionData[currentFСEditor]?.start) ?
                 <>
                     <div className="flex-col px-8 text-black ">
-                        <div className="text-black mt-4 text-2xl font-bold mb-2">{"Связь '" + getFactorById(factorConnectionData[currentFСEditor].start).name + " - " + getFactorById(factorConnectionData[currentFСEditor].end).name + "'"}</div>
-                        <div className="mt-2">{getFactorById(factorConnectionData[currentFСEditor].start).isExternal ? "Данная связь показывает влияние внешнего фактора на управляемый. Вы можете оценить его методом кластеризации или назначить оценку вручную." : "Выберите метод оценки данной связи, вы можете настроить статистическую оценку или назначить оценку вручную."}</div>
+                        <div className="text-black mt-4 text-2xl font-bold mb-2">{"Связь '" + getFactorById(factorConnectionData[currentFСEditor]?.start)?.name + " - " + getFactorById(factorConnectionData[currentFСEditor].end).name + "'"}</div>
+                        <div className="mt-2">{getFactorById(factorConnectionData[currentFСEditor]?.start).isExternal ? "Данная связь показывает влияние внешнего фактора на управляемый. Вы можете оценить его методом кластеризации или назначить оценку вручную." : "Выберите метод оценки данной связи, вы можете настроить статистическую оценку или назначить оценку вручную."}</div>
                         <div className="text-lg mt-4 font-bold mb-1">Метод оценки связи</div>
                         <div className="flex text-lg">
                             {
-                                !getFactorById(factorConnectionData[currentFСEditor].start).isExternal ?
+                                !getFactorById(factorConnectionData[currentFСEditor]?.start)?.isExternal ?
                                     <div className="flex items-center">
                                         <div
                                             onClick={() => {

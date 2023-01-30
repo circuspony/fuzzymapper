@@ -116,8 +116,10 @@ const EditorSidebar = ({
         <>
 
             <div
+                style={{ maxWidth: "10%" }}
                 className="flex bg-violet-dark min-w-16 w-1/10 h-full flex-col z-30 flex-shrink"></div>
             <div
+                style={{ maxWidth: "10%" }}
                 className="fixed flex bg-violet-dark min-w-16 w-1/10 h-full flex-col z-40 flex-shrink">
 
                 <div
@@ -186,21 +188,25 @@ const EditorSidebar = ({
                     Импорт CSV
                 </div> : <></>}
                 {currentWindow === EDITOR_WINDOWS.FACTORS ?
-                    <div className="flex flex-col">
+                    <div style={{ maxWidth: "95%" }} className="flex flex-col">
                         <div
                             className="mx-auto mt-1 font-medium"
                         >
                             Список факторов
                         </div>
-                        {factorData.filter(f => f !== null).map((factor, fi) =>
-                            <div
-                                onClick={() => { setCurrentFEditor(fi) }}
-                                className="ml-2 items-center flex mt-1 font-medium hover:cursor-pointer hover:text-yellow-500"
-                            >
-                                <div className={`h-5 w-5 mr-2 rounded-md ${factor.isExternal ? "bg-green-500" : "bg-violet"}`}></div>
-                                <span>{factor.name}</span>
-                            </div>
-                        )}
+                        <div style={{ overflowY: "scroll", height: "90%" }} className="sc flex-col">
+
+                            {factorData.filter(f => f !== null).map((factor, fi) =>
+                                <div
+                                    onClick={() => { setCurrentFEditor(fi) }}
+                                    className="ml-2 text-sm  items-center flex mt-1 font-medium hover:cursor-pointer hover:text-yellow-500"
+                                >
+                                    <div className={`h-5 w-5 mr-2 rounded-md ${factor.isExternal ? "bg-green-500" : "bg-violet"}`}></div>
+                                    <span>{factor.name}</span>
+                                </div>
+                            )}
+                        </div>
+
                     </div> : <></>}
                 {currentWindow === EDITOR_WINDOWS.CONNECTIONS ?
                     <div className="flex flex-col">
@@ -209,24 +215,28 @@ const EditorSidebar = ({
                         >
                             Список связей
                         </div>
-                        {factorConnectionData.filter(f => f !== null).map((fc, fсi) => {
-                            let f1 = getFactorById(fc.start)
-                            let f2 = getFactorById(fc.end)
-                            return (
-                                <div
-                                    onClick={() => { setCurrentFСEditor(fсi) }}
-                                    className="ml-2 items-center flex mt-1 font-medium hover:cursor-pointer hover:text-yellow-500"
-                                >
-                                    <div className={`h-5 w-5 mr-2 rounded-md ${f1.isExternal ? "bg-green-500" : "bg-violet"}`}></div>
-                                    <div className="flex-col">
-                                        <div>{"От: " + f1.name}</div>
-                                        <div>{"До: " + f2.name}</div>
-                                    </div>
+                        <div style={{ overflowY: "scroll", height: "90%" }} className="sc flex-col">
 
-                                </div>
-                            )
-                        }
-                        )}
+                            {factorConnectionData.filter(f => f !== null).map((fc, fсi) => {
+                                let f1 = getFactorById(fc.start)
+                                let f2 = getFactorById(fc.end)
+                                return (
+                                    <div
+                                        onClick={() => { setCurrentFСEditor(fсi) }}
+                                        className="ml-2 items-center flex mt-1 font-medium hover:cursor-pointer hover:text-yellow-500"
+                                    >
+                                        <div className={`h-5 w-5 mr-2 rounded-md ${f1.isExternal ? "bg-green-500" : "bg-violet"}`}></div>
+                                        <div className="flex-col text-xs">
+                                            <div>{"От: " + f1.name}</div>
+                                            <div>{"До: " + f2.name}</div>
+                                        </div>
+
+                                    </div>
+                                )
+                            }
+                            )}
+                        </div>
+
                     </div> : <></>}
 
                 {currentWindow === EDITOR_WINDOWS.ANALYSIS ?

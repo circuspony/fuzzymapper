@@ -463,52 +463,56 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                     setCurrentConnectId(null)
                 }}
                 ref={editorAreRef}
-                className={`editorArea sc overflow-scroll w-full h-screen relative z-0 flex ${currentWindow === EDITOR_WINDOWS.GRAPH ? "flex" : currentWindow === EDITOR_WINDOWS.ANALYSIS ? "flex pointer-events-none" : "hidden"}`}>
-                <Xwrapper>
-                    {factorData.map((factor, index) =>
-                        <FactorObject
-                            factorEvals={factorEvals}
-                            currentWindow={currentWindow}
-                            currentAnalysisObject={currentAnalysisObject}
-                            factorData={factor}
-                            factorIndex={index}
-                            openASubMap={openASubMap}
-                            isSubMap={isSubMap}
-                            currentConnectId={currentConnectId}
-                            setCurrentConnectId={setCurrentConnectId}
-                            changeFactorData={(newFactorData) => changeFactorData(index, newFactorData)}
-                            removeFactorData={() => removeFactor(index)}
-                            addFactorConnection={addFactorConnection}
-                            addIndicator={addIndicator}
-                            editIndicator={editIndicator}
-                            removeIndicator={removeIndicator}
-                            setIndicatorChoiceOpen={setIndicatorChoiceOpen}
-                            setIndicatorChoiceId={setIndicatorChoiceId}
-                            setIndicatorInfMenuOpen={setIndicatorInfMenuOpen}
-                            setCurrentFInddicatorIndex={setCurrentFInddicatorIndex}
-                            setCurrentInddicatorIndex={setCurrentInddicatorIndex}
-                        />)}
-                    {factorConnectionData.map((factorConnection, index) =>
-                        <>
-                            <Xarrow
-                                start={factorConnection.start}
-                                end={factorConnection.end}
-                                headSize={4}
-                                strokeWidth={3}
-                                labels={<LineEditor
-                                    setModalOpen={(value) => {
-                                        if (value) {
-                                            setCurrentFactorConIndex(index)
-                                        }
-                                        setIndicatorMenuOpen(value)
-                                    }}
-                                    removeFunction={() => removeFactorConnection(index)}
-                                    changeFunction={(newInfluence) => changeFactorConnectionInfluence(index, newInfluence)}
-                                    influence={setEvalInfluence(factorConnection)} />}
-                                color="rgb(147 197 253)" />
-                        </>
-                    )}
-                </Xwrapper>
+                className={`editorArea sc overflow-scroll w-full h-screen relative z-0 flex ${currentWindow === EDITOR_WINDOWS.GRAPH || currentWindow === EDITOR_WINDOWS.ANALYSIS ? "flex" : "hidden"}`}>
+
+                <div className={`w-full h-full transparent ${currentWindow === EDITOR_WINDOWS.GRAPH || currentWindow === EDITOR_WINDOWS.ANALYSIS ? "flex" : "hidden"} ${currentWindow === EDITOR_WINDOWS.ANALYSIS ? " pointer-events-none" : ""}`}>
+                    <Xwrapper>
+                        {factorData.map((factor, index) =>
+                            <FactorObject
+                                factorEvals={factorEvals}
+                                currentWindow={currentWindow}
+                                currentAnalysisObject={currentAnalysisObject}
+                                factorData={factor}
+                                factorIndex={index}
+                                openASubMap={openASubMap}
+                                isSubMap={isSubMap}
+                                currentConnectId={currentConnectId}
+                                setCurrentConnectId={setCurrentConnectId}
+                                changeFactorData={(newFactorData) => changeFactorData(index, newFactorData)}
+                                removeFactorData={() => removeFactor(index)}
+                                addFactorConnection={addFactorConnection}
+                                addIndicator={addIndicator}
+                                editIndicator={editIndicator}
+                                removeIndicator={removeIndicator}
+                                setIndicatorChoiceOpen={setIndicatorChoiceOpen}
+                                setIndicatorChoiceId={setIndicatorChoiceId}
+                                setIndicatorInfMenuOpen={setIndicatorInfMenuOpen}
+                                setCurrentFInddicatorIndex={setCurrentFInddicatorIndex}
+                                setCurrentInddicatorIndex={setCurrentInddicatorIndex}
+                            />)}
+                        {factorConnectionData.map((factorConnection, index) =>
+                            <>
+                                <Xarrow
+                                    start={factorConnection.start}
+                                    end={factorConnection.end}
+                                    headSize={4}
+                                    strokeWidth={3}
+                                    labels={<LineEditor
+                                        setModalOpen={(value) => {
+                                            if (value) {
+                                                setCurrentFactorConIndex(index)
+                                            }
+                                            setIndicatorMenuOpen(value)
+                                        }}
+                                        removeFunction={() => removeFactorConnection(index)}
+                                        changeFunction={(newInfluence) => changeFactorConnectionInfluence(index, newInfluence)}
+                                        influence={setEvalInfluence(factorConnection)} />}
+                                    color="rgb(147 197 253)" />
+                            </>
+                        )}
+                    </Xwrapper>
+                </div>
+
             </div >
             <div
                 className={`${currentWindow === EDITOR_WINDOWS.OBJECTS ? "flex w-full sc overflow-scroll" : "hidden"}`}>
