@@ -32,7 +32,7 @@ const FactorObject = ({
     const textAreaRef = useRef(null)
     const factorRef = useRef(null)
     const [width, setWidth] = useState(200);
-    const [height, setHeight] = useState(45)
+    const [height, setHeight] = useState(55)
 
     const [inputInfo, setInputInfo] = useState("");
     const [inputActive, setInputActive] = useState(false)
@@ -140,7 +140,7 @@ const FactorObject = ({
                             setInputActive(false)
                             changeFactorData({ name: inputInfo })
                         }}
-                        className={`bg-transparent border-0 p-4 pb-0 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
+                        className={`bg-transparent overflow-hidden border-0 p-4 pb-0 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
                     />
                     <div style={{ minHeight: "1rem" }} className=" text-xs font-bold w-full pt-1.5 pb-3 bottom-0 px-3">
 
