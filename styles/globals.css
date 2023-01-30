@@ -47,6 +47,11 @@ a {
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+.sc{
+  
+  scrollbar-width:4px;
+  scrollbar-color: rgb(88 28 135) transparent;
+}
 .sc::-webkit-scrollbar {
     width: 0.75em;
     background-color: transparent;
