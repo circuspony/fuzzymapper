@@ -42,6 +42,7 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
         setRegressions(response.data.regressions)
         setIndIn(fsi)
         setIndOut(fei)
+        setStep(2)
     }
     const getRegressionEval = async () => {
         let fsi = indIn.filter(i => i !== null).map((io, ii) => (objectData.find(o => o.title === io.name).values))
@@ -92,7 +93,6 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
                         </div>
                         <div
                             onClick={() => {
-                                setStep(2)
                                 getRegressions()
                             }}
                             className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
