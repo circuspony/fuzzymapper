@@ -140,9 +140,9 @@ const FactorObject = ({
                             setInputActive(false)
                             changeFactorData({ name: inputInfo })
                         }}
-                        className={`bg-transparent overflow-hidden border-0 p-4 pb-0 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
+                        className={`bg-transparent atext overflow-hidden border-0 p-4 pb-0 ${currentWindow === "analysis" ? "pb-8" : ""} rounded-3xl ${inputActive ? "" : "pointer-events-none"}`}
                     />
-                    <div style={{ minHeight: "1rem" }} className=" text-xs font-bold w-full pt-1.5 pb-3 bottom-0 px-3">
+                    <div style={{ minHeight: "1rem" }} className="etext text-xs font-bold w-full pt-1.5 pb-3 bottom-0">
 
                         {currentWindow === "analysis" && factorEvals.findIndex(fe => fe.id === factorData.id) >= 0 ?
                             <span className="">{getEvalString()}</span>

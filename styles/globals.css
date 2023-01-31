@@ -49,7 +49,7 @@ a {
 }
 .sc{
   
-  scrollbar-width:4px;
+  scrollbar-width:20px;
   scrollbar-color: rgb(88 28 135) transparent;
 }
 .sc::-webkit-scrollbar {
@@ -67,4 +67,19 @@ a {
     border: 3px solid transparent;
     background-clip: content-box;
     background-color: rgb(88 28 135);
+}
+.etext {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  }
+@-moz-document url-prefix() {
+  .atext {
+  width:99%;
+  margin-left: auto;
+  margin-right: auto;
+  }
+  .etext {
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+    }
 }
