@@ -1,6 +1,6 @@
 import { MutableRefObject, useEffect, useRef } from "react";
 
-const ModalOverlay = ({ children, modalOpen, setModalOpen, classes = '' }) => {
+const ModalOverlay = ({ children, modalOpen, setModalOpen, classes = '', canClose = true }) => {
     const modalOverlayRef = useRef() as MutableRefObject<HTMLDivElement>;
     const modalWrap = useRef();
     useEffect(() => {
@@ -18,7 +18,7 @@ const ModalOverlay = ({ children, modalOpen, setModalOpen, classes = '' }) => {
                     if (
                         e.target === modalOverlayRef.current || e.target === modalWrap.current
                     ) {
-                        setModalOpen();
+                        if (canClose) setModalOpen()
                     }
                 }
             }}
