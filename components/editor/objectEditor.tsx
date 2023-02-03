@@ -12,13 +12,15 @@ const ObjectEditor = ({ objectData,
     const [tempIndex, setTempIndex] = useState(0)
     const [tempFIndex, setTempFIndex] = useState(0)
     const [tempKIndex, setTempKIndex] = useState(false)
+    const [tempD, setTempD] = useState(false)
     const [isField, setIsField] = useState(false)
 
-    const editField = (i, title, key) => {
+    const editField = (i, title, key, date = false) => {
         let copy = [...objectData]
         copy[i] = {
             title: title,
             key: key,
+            date: date,
             values: copy[i].values
         }
         setObjectData(copy)
@@ -37,6 +39,7 @@ const ObjectEditor = ({ objectData,
                 return {
                     title: field.title,
                     key: field.key,
+                    date: field.date,
                     values: copy
                 }
             }
@@ -48,6 +51,7 @@ const ObjectEditor = ({ objectData,
             return {
                 title: field.title,
                 key: field.key,
+                date: field.date,
                 values: field.values.filter((_, index) => index !== i)
             }
         }))
@@ -70,18 +74,22 @@ const ObjectEditor = ({ objectData,
                                 {el.key ?
                                     <div className="ml-1 transition-all duration-300 text-3xl text-blue-300">✰</div>
                                     : <></>}
+                                {el.date ?
+                                    <div className="ml-1 transition-all duration-300 text-3xl text-red-300">✰</div>
+                                    : <></>}
                                 <div
                                     onClick={() => {
                                         setIsField(true)
                                         setTempValue(el.title)
                                         setTempFIndex(i)
                                         setTempKIndex(el.key)
+                                        setTempD(el.date)
                                         setValueEditorOpen(true)
                                     }}
-                                    className={`ml-auto transition-all duration-300 text-3xl opacity-0 group-hover:opacity-100 text-blue-300 hover:text-violet-dark`}>✎</div>
+                                    className={`ml-auto transition-all duration-300 text-3xl opacity-0 group-hover:opacity-100 text-blue-300 hover:text-violet-dark cursor-pointer `}>✎</div>
                                 {objectData.length > 1 ? <div
                                     onClick={() => { removeField(i) }}
-                                    className={`ml-2 transition-all duration-300 text-3xl opacity-0 group-hover:opacity-100 text-red-300 hover:text-violet-dark`}>🗑</div>
+                                    className={`ml-2 transition-all duration-300 text-3xl opacity-0 group-hover:opacity-100 text-red-300 hover:text-violet-dark cursor-pointer `}>🗑</div>
                                     : <></>}
                             </div>
                         )
@@ -102,13 +110,13 @@ const ObjectEditor = ({ objectData,
                                             setTempFIndex(fi)
                                             setValueEditorOpen(true)
                                         }}
-                                        className={`ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark`}>✎</div>
+                                        className={`ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark cursor-pointer `}>✎</div>
                                 </div>
                             )
                             )}
                             <div
                                 onClick={() => { removeObject(i) }}
-                                className={`ml-2 transition-all duration-300 text-3xl text-red-300 hover:text-violet-dark`}>🗑</div>
+                                className={`ml-2 transition-all cursor-pointer duration-300 text-3xl text-red-300 hover:text-violet-dark`}>🗑</div>
                         </div>
                     )}
                 </div>
@@ -139,11 +147,20 @@ const ObjectEditor = ({ objectData,
                                 <div className="ml-2 text-violet-border my-auto">Сделать ключевым</div>
 
                             </div>
+                            <div className="flex mt-2 шеуьы-сутеук">
+                                <div
+                                    onClick={() => {
+                                        setTempD(!tempD)
+                                    }}
+                                    className={`w-8 h-8 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${tempD ? "bg-red-500" : ""}`}></div>
+                                <div className="ml-2 text-violet-border my-auto">Сделать временным</div>
+
+                            </div>
                         </> : <></>}
                     <div
                         onClick={() => {
                             if (isField) {
-                                editField(tempFIndex, tempValue, tempKIndex)
+                                editField(tempFIndex, tempValue, tempKIndex, tempD)
                             }
                             else {
                                 editObject(tempFIndex, tempIndex, tempValue)

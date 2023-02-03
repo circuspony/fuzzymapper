@@ -36,6 +36,9 @@ const FuzzyMode = ({
     const [step, setStep] = useState(1);
     const [readyFunctionSets, setFunctionSets] = useState([]);
     const [outlier, setOutlier] = useState(false);
+    const [dynamic, setDynamic] = useState(false);
+
+
     const [lowOutlier, setLowOutlier] = useState("Малый выброс");
     const [highOutlier, setHighOutlier] = useState("Большой выброс");
 
@@ -148,7 +151,8 @@ const FuzzyMode = ({
                 }
             }
             const response = await backendAxios.post("/outlier", {
-                data: objectsWithExt.map(owe => owe.array)
+                data: objectsWithExt.map(owe => owe.array),
+                dynamic
             })
             objectsWithExt = objectsWithExt.map((owe, i) => { return { ...owe, array: response.data.objectSet[i] } })
             for (let owe of objectsWithExt) {
@@ -195,7 +199,8 @@ const FuzzyMode = ({
         else {
 
             const response = await backendAxios.post("/outlier", {
-                data: [objectsIndexed]
+                data: [objectsIndexed],
+                dynamic
             })
             let standardSets = createStandardFunctionSets(response.data.objectSet[0])
             standardSets = standardSets.map(s => ({ ...s, title: "Стандратная", type: MEMBERSHIP.TRIANGLE, external: false }))
@@ -250,6 +255,18 @@ const FuzzyMode = ({
                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
                     <span>Обработать выбросы</span>
                 </div>
+                {objectData.filter(o => o.key).length === 1 && objectData.filter(o => o.date).length === 1 ?
+                    <>
+                        <div className="flex items-center mt-2 ">
+                            <div
+                                onClick={() => {
+                                    setDynamic(!dynamic)
+                                }}
+                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${dynamic ? "bg-red-500" : ""}`}></div>
+                            <span>Обработать для динамической оценки</span>
+                        </div>
+                    </> : <></>
+                }
                 <div
                     onClick={() => {
                         setTermNames(Array.from(Array(terms).keys()))

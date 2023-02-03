@@ -333,6 +333,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         {
             title: "Название",
             key: false,
+            date: false,
             values: []
         }
     ]);
@@ -342,6 +343,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         setObjectData([...objectData, {
             title: "Индикатор" + (objectData.length + 1),
             key: false,
+            date: false,
             values: new Array(objectData[0].values.length).fill(0)
         }])
     }
@@ -350,6 +352,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
             let newEl = {
                 title: el.title,
                 key: el.key,
+                date: el.date,
                 values: [...el.values, 0]
             }
             return newEl

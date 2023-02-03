@@ -39,7 +39,7 @@ const EditorSidebar = ({
     const [file, setFile] = useState(null)
 
     const getObjectName = (index) => {
-        let filtered = objectData.filter(f => f.key === true)
+        let filtered = objectData.filter(f => f.key || f.date === true)
         if (filtered.length) {
             return filtered.reduce(
                 (a, c) => {
@@ -89,6 +89,7 @@ const EditorSidebar = ({
                         newArray.push({
                             title: element,
                             key: false,
+                            date: false,
                             values: []
                         })
                     });
