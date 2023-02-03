@@ -14,7 +14,7 @@ import useDraggableScroll from 'use-draggable-scroll';
 export default function Home() {
     const [isSubMap, seIsSubMap] = useState(false);
     const [modalOpen, setModalOpen] = useState(true);
-    const laod = async () => {
+    const load = async () => {
         const response = await backendAxios.post("/test", {})
         if (response.data.status === "ok") {
             setModalOpen(false)
@@ -22,7 +22,7 @@ export default function Home() {
 
     }
     useEffect(() => {
-        laod()
+        load()
     }, [])
     return (
         <div

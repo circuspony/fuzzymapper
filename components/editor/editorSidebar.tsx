@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import Link from 'next/link';
 import Papa from "papaparse";
-
+import html2canvas from "html2canvas"
 
 const allowedExtensions = ["csv"];
 
@@ -112,6 +112,12 @@ const EditorSidebar = ({
         }
     }, [data])
 
+    const getScreen = async () => {
+        await html2canvas(document.getElementById("editor")).then(canvas => {
+            // document.body.appendChild(canvas)
+            console.log(canvas.toDataURL())
+        });
+    }
     return (
         <>
 
@@ -289,6 +295,13 @@ const EditorSidebar = ({
                                 Редактировать проект
                             </div>
                         }
+                        {/* <div
+                            onClick={() => { getScreen() }}
+                            className="mx-auto mt-auto font-medium hover:cursor-pointer hover:text-yellow-500"
+                        >
+                            Изображение
+                        </div>
+                        <img></img> */}
                         <div
                             onClick={() => { exportFile() }}
                             className="mx-auto mt-auto font-medium hover:cursor-pointer hover:text-yellow-500"
