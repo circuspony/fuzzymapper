@@ -456,6 +456,8 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                 currentFСEditor={currentFСEditor}
                 setCurrentFСEditor={setCurrentFСEditor}
 
+                factorEvals={factorEvals}
+
                 objectData={objectData}
                 currentAnalysisObject={currentAnalysisObject}
                 setCurrentAnalysisObject={setCurrentAnalysisObject}
