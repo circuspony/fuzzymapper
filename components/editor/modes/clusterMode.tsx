@@ -119,10 +119,10 @@ const ClusterMode = ({
                     Рассчитать
                 </div>
             </> : <>Не хватает данных для расчета</>}
-            {factorEvals.findIndex((f) => f.id === factor.id) >= 0 ?
+            {factorEvals.findIndex((f) => f.id === factor.id) >= 0 && factorEvals.find((f) => f.id === factor.id).centers?.length ?
                 <>
                     <div className="text-lg mt-4 font-bold mb-1">Центры полученных кластеров</div>
-                    {factorEvals.find((f) => f.id === factor.id).centers.map(f => <>
+                    {factorEvals.find((f) => f.id === factor.id).centers?.map(f => <>
                         <div>{f.join(", ")}</div>
                     </>)}
                     <div className="text-lg mt-4 font-bold mb-1">Назначьте названия кластеров</div>

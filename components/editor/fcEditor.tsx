@@ -74,9 +74,6 @@ const FactorConnectionEditor = ({
     const setEval = (ev) => {
         changeFactorConnectionInfluence(currentFСEditor, "?", ev)
     }
-    const setRegEval = (ev) => {
-        changeFactorConnectionInfluence(currentFСEditor, "?", [ev])
-    }
     const setChainEvals = (ev, fe) => {
         const currentTrace = trace(fe)
         let neededTrace = currentTrace.find(t => t[t.length - 1] === fe.id)
@@ -136,26 +133,23 @@ const FactorConnectionEditor = ({
                         <div className="mt-2">{getFactorById(factorConnectionData[currentFСEditor]?.start).isExternal ? "Данная связь показывает влияние внешнего фактора на управляемый. Вы можете оценить его методом кластеризации или назначить оценку вручную." : "Выберите метод оценки данной связи, вы можете настроить статистическую оценку или назначить оценку вручную."}</div>
                         <div className="text-lg mt-4 font-bold mb-1">Метод оценки связи</div>
                         <div className="flex text-lg">
-                            {
-                                !getFactorById(factorConnectionData[currentFСEditor]?.start)?.isExternal ?
-                                    <div className="flex items-center">
-                                        <div
-                                            onClick={() => {
-                                                setMethod(METHODS.REGRESSION)
-                                            }}
-                                            className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.REGRESSION ? "bg-violet" : ""}`}></div>
-                                        <span>Регрессия</span>
-                                    </div>
-                                    :
-                                    <div className="flex items-center">
-                                        <div
-                                            onClick={() => {
-                                                setMethod(METHODS.CLUSTERING)
-                                            }}
-                                            className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.CLUSTERING ? "bg-green-500" : ""}`}></div>
-                                        <span>Кластеризация</span>
-                                    </div>}
-                            <div className="flex ml-2 items-center">
+                            <div className="flex items-center">
+                                <div
+                                    onClick={() => {
+                                        setMethod(METHODS.REGRESSION)
+                                    }}
+                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.REGRESSION ? "bg-violet" : ""}`}></div>
+                                <span>Регрессия</span>
+                            </div>
+                            <div className="flex  ml-2 items-center">
+                                <div
+                                    onClick={() => {
+                                        setMethod(METHODS.CLUSTERING)
+                                    }}
+                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.CLUSTERING ? "bg-green-500" : ""}`}></div>
+                                <span>Кластеризация</span>
+                            </div>
+                            {/* <div className="flex ml-2 items-center">
                                 <div
                                     onClick={() => {
                                         updateExpertEvals()
@@ -163,7 +157,7 @@ const FactorConnectionEditor = ({
                                     }}
                                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
                                 <span>Аккумуляция</span>
-                            </div>
+                            </div> */}
                             <div className="flex ml-2 items-center">
                                 <div
                                     onClick={() => {
@@ -177,8 +171,9 @@ const FactorConnectionEditor = ({
                         </div>
                         {method === METHODS.REGRESSION ? <>
                             <RegressionMode
-                                setRegEval={setRegEval}
+                                setEval={setEval}
                                 objectData={objectData}
+                                factorEvals={factorEvals}
                                 factorS={getFactorById(factorConnectionData[currentFСEditor].start)}
                                 factorE={getFactorById(factorConnectionData[currentFСEditor].end)}
                             />

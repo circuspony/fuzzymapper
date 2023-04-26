@@ -4,23 +4,33 @@ import backendAxios from '../../network/backend'
 import RegressionCard from "./regressionCard"
 
 
-const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
+const RegressionMode = ({ objectData, factorEvals, factorS, factorE, setEval }) => {
     const [step, setStep] = useState(1);
     const [regressions, setRegressions] = useState([]);
+    const [newRegressions, setNewRegressions] = useState([]);
     const [mainReg, setMainReg] = useState(null);
+    const [mainRegMany, setMainRegMany] = useState(null);
     const [indIn, setIndIn] = useState([]);
     const [indOut, setIndOut] = useState([]);
     const [reverseX, setReverseX] = useState(false);
     const [reverseY, setReverseY] = useState(false);
     const [outlier, setOutlier] = useState(false);
+    const [grouping, setGrouping] = useState(false);
+
+    const [currentTerm, setCurrentTerm] = useState(-1);
+    const [currentTermPCA, setCurrentTermPCA] = useState(-1);
 
 
     useEffect(() => {
         setStep(1)
         setRegressions([])
+        setNewRegressions([])
         setMainReg(null)
         setIndIn([])
         setIndOut([])
+        setGrouping(false)
+        setCurrentTerm(-1)
+        setCurrentTermPCA(-1)
     }, [factorS, factorE])
 
 
@@ -34,12 +44,16 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
         let fei = factorE.indicators.filter(i => i !== null).map((io, ii) => ({ ...io, values: objectData.find(o => o.title === io.name).values }))
         const response = await backendAxios.post("/regression", {
             data: {
+                grouping: grouping,
                 fsi: fsi,
                 fei: fei,
+                iv: factorEvals.find(fe => fe.id === factorS.id).labels,
                 outlier: outlier
             }
         })
         setRegressions(response.data.regressions)
+        setNewRegressions(response.data.newRegressions)
+        setCurrentTerm(0)
         setIndIn(fsi)
         setIndOut(fei)
         setStep(2)
@@ -53,17 +67,23 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
                 fei: fei,
                 reverseX,
                 reverseY,
+                iv: factorEvals.find(fe => fe.id === factorS.id).labels,
                 outlier: outlier
             }
         })
         setMainReg(response.data.regression)
+        setMainRegMany(response.data.newRegression)
+        setCurrentTermPCA(0)
         setStep(3)
     }
 
     const acceptReg = () => {
-        setRegEval(Math.min(1, mainReg.b))
+        if (!grouping)
+            setEval([Math.min(1, mainReg.b)])
+        else {
+            setEval(mainRegMany.map(mr => Math.min(1, mr.b)))
+        }
     }
-
     return (
         <>
             <div className="text-black flex-col">
@@ -91,6 +111,17 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
                                 className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
                             <span>Обработать выбросы</span>
                         </div>
+                        {factorEvals.find(fe => fe.id === factorS.id).labels ?
+                            <div className="flex items-center mt-2 ">
+                                <div
+                                    onClick={() => {
+                                        setGrouping(!grouping)
+
+                                    }}
+                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${grouping ? "bg-red-500" : ""}`}></div>
+                                <span>Разделить по термам</span>
+                            </div>
+                            : null}
                         <div
                             onClick={() => {
                                 getRegressions()
@@ -102,14 +133,41 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
                     : null}
                 {step >= 2 ?
                     <>
+                        {grouping ? <>
+                            <div className="text-lg mt-4 font-bold mb-1">Выберите терм</div>
+
+                            <div className="flex my-2">
+                                {factorEvals.find(fe => fe.id === factorS.id)?.eLabels.map((term, ti) =>
+                                    <>
+                                        <div className="flex items-center mt-2 mr-2">
+                                            <div
+                                                onClick={() => {
+                                                    setCurrentTerm(ti)
+                                                }}
+                                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${ti == currentTerm ? "bg-blue-500" : ""}`}></div>
+                                            <span>{term}</span>
+                                        </div>
+                                    </>)}
+                            </div>
+                        </> : <></>}
                         <div className="text-lg mt-4 font-bold mb-1">Получены регрессии</div>
-                        <div className="w-full pr-8 grid grid-cols-2">
-                            {regressions.map(r =>
-                                <RegressionCard
-                                    regression={r}
-                                />
-                            )}
-                        </div>
+
+                        {grouping ?
+                            <div className="w-full pr-8 grid grid-cols-2">
+                                {newRegressions.map(r =>
+                                    <RegressionCard
+                                        regression={r[currentTerm]}
+                                    />
+                                )}
+                            </div>
+                            : <div className="w-full pr-8 grid grid-cols-2">
+                                {regressions.map(r =>
+                                    <RegressionCard
+                                        regression={r}
+                                    />
+                                )}
+                            </div>}
+
                         <div className="text-lg mt-4 font-bold mb-1">Выберите значимые индикаторы</div>
                         <div className="mt-4 font-bold mb-1">Индикаторы входного фактора</div>
                         {factorS?.indicators.filter(i => i !== null).map((i) =>
@@ -167,10 +225,39 @@ const RegressionMode = ({ objectData, factorS, factorE, setRegEval }) => {
                     step >= 3 && mainReg ?
                         <>
                             <div className="text-lg text-violet-border mt-2 font-bold mb-1">Результат анализа</div>
-                            <RegressionCard
-                                regression={mainReg}
-                                title={false}
-                            />
+
+                            {grouping ? <>
+                                <div className="text-lg mt-4 font-bold mb-1">Выберите терм</div>
+
+                                <div className="flex my-2">
+                                    {factorEvals.find(fe => fe.id === factorS.id)?.eLabels.map((term, ti) =>
+                                        <>
+                                            <div className="flex items-center mt-2 mr-2">
+                                                <div
+                                                    onClick={() => {
+                                                        setCurrentTermPCA(ti)
+                                                    }}
+                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${ti == currentTermPCA ? "bg-blue-500" : ""}`}></div>
+                                                <span>{term}</span>
+                                            </div>
+                                        </>)}
+                                </div>
+                            </> : <></>}
+
+                            {grouping ?
+                                <RegressionCard
+                                    regression={mainRegMany[currentTermPCA]}
+                                    title={false}
+                                    reverseX
+                                    reverseY
+                                />
+                                : <RegressionCard
+                                    regression={mainReg}
+                                    reverseX
+                                    reverseY
+                                    title={false}
+                                />}
+
                             <div className="flex items-center">
                                 <div
                                     onClick={() => {

@@ -11,11 +11,15 @@ const RegressionCard = ({ regression, title = true, pca = false, reverseX = fals
                     <div className="text-lg text-violet-border mt-4 font-bold mb-1">{"Вход: " + regression.from}</div>
                     <div className="text-lg text-violet-border font-bold mb-1">{"Выход: " + regression.to}</div>
                 </> : null}
-                <div className="text-lg mt-1 font-bold mb-1">Параметры</div>
+                {regression.b === 0 ?
+                    <div className="text-lg mt-1 text-red-500 font-bold mb-1">Недостаточно данных</div>
+
+                    : <div className="text-lg mt-1 font-bold mb-1">Параметры</div>}
                 <div className=" mb-1">{"Коэффициент регрессии: " + regression.b}</div>
                 <div className=" mb-1">{"Коэффициент Фишера: " + regression.F}</div>
                 <div className="relative z-10 mb-1">{"P-значение: " + regression.p}</div>
                 <div className="relative z-10 mb-1">{"Коэффициент детерминации: " + regression.r2}</div>
+
                 <div style={{ maxWidth: "30rem" }}>
                     <VictoryChart
                         height={300}

@@ -93,7 +93,7 @@ const FactorEditor = ({
                                     <div
                                         onClick={() => {
                                             changeFactorData(currentFEditor, { isExternal: true })
-                                            setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
+                                            // setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
                                         }}
                                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${getFilteredfactorData()[currentFEditor]?.isExternal ? "bg-green-500" : ""}`}></div>
                                     <span>Внешний</span>
@@ -102,108 +102,105 @@ const FactorEditor = ({
                                     <div
                                         onClick={() => {
                                             changeFactorData(currentFEditor, { isExternal: false })
-                                            setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
+                                            // setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
 
                                         }}
                                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${!getFilteredfactorData()[currentFEditor]?.isExternal ? "bg-violet" : ""}`}></div>
                                     <span>Управляемый</span>
                                 </div>
                             </div>
-                            {getFilteredfactorData()[currentFEditor]?.isExternal ?
-                                <div className="flex flex-col sc">
-                                    <div className="text-lg mt-4 font-bold mb-1">Метод оценки</div>
-                                    <div className="flex text-lg">
-                                        <div className="flex items-center">
-                                            <div
-                                                onClick={() => {
-                                                    setMethod(method === METHODS.CLUSTERING ? null : METHODS.CLUSTERING)
-                                                }}
-                                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.CLUSTERING ? "bg-blue-500" : ""}`}></div>
-                                            <span>Кластеризация</span>
+                            <div className="flex flex-col">
+                                <div className="text-lg mt-4 font-bold mb-1">Метод оценки</div>
+                                <div className="flex">
+                                    {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length ? <>
+
+                                        <div className="flex mr-2 text-lg">
+                                            <div className="flex items-center">
+                                                <div
+                                                    onClick={() => {
+                                                        setMethod(method === METHODS.FUZZY ? null : METHODS.FUZZY)
+                                                        // setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
+
+                                                    }}
+                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.FUZZY ? "bg-red-500" : ""}`}></div>
+                                                <span>Фаззификация</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    {method === METHODS.CLUSTERING ?
-                                        <>
-                                            <ClusterMode
-                                                objectData={objectData}
-                                                clusters={clusters}
-                                                setClusters={setClusters}
-                                                factor={getFilteredfactorData()[currentFEditor]}
-                                                factorEvals={factorEvals}
-                                                setFactorEvals={setFactorEvals} />
-                                        </>
-                                        : <></>}
-                                </div>
-                                : <></>
+                                    </> : <></>}
+                                    {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length ? <>
+                                        <div className="flex text-lg">
+                                            <div className="flex items-center">
+                                                <div
+                                                    onClick={() => {
+                                                        setMethod(method === METHODS.CLUSTERING ? null : METHODS.CLUSTERING)
+                                                        // setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
 
-                            }
-                            {!getFilteredfactorData()[currentFEditor]?.isExternal ?
-                                <div className="flex flex-col">
-                                    <div className="text-lg mt-4 font-bold mb-1">Метод оценки</div>
-                                    <div className="flex">
-                                        {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length ? <>
-
-                                            <div className="flex mr-2 text-lg">
-                                                <div className="flex items-center">
-                                                    <div
-                                                        onClick={() => {
-                                                            setMethod(method === METHODS.FUZZY ? null : METHODS.FUZZY)
-                                                        }}
-                                                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.FUZZY ? "bg-red-500" : ""}`}></div>
-                                                    <span>Фаззификация</span>
-                                                </div>
+                                                    }}
+                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.CLUSTERING ? "bg-blue-500" : ""}`}></div>
+                                                <span>Кластеризация</span>
                                             </div>
-                                        </> : <></>}
-                                        {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length === 0 ? <>
+                                        </div>
+                                    </> : <></>}
+                                    {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length === 0 ? <>
 
-                                            <div className="flex text-lg">
-                                                <div className="flex items-center">
-                                                    <div
-                                                        onClick={() => {
-                                                            setMethod(method === METHODS.ACCUMULATOR ? null : METHODS.ACCUMULATOR)
-                                                        }}
-                                                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
-                                                    <span>Аккумуляция</span>
-                                                </div>
+                                        {/* <div className="flex text-lg">
+                                            <div className="flex items-center">
+                                                <div
+                                                    onClick={() => {
+                                                        setMethod(method === METHODS.ACCUMULATOR ? null : METHODS.ACCUMULATOR)
+                                                        // setFactorEvals(factorEvals.filter(fe => fe.id != getFilteredfactorData()[currentFEditor]?.id))
+                                                    }}
+                                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
+                                                <span>Аккумуляция</span>
                                             </div>
-                                        </> : <></>}
-                                        { }
-                                    </div>
-                                    {method === METHODS.FUZZY ?
-                                        <>
-                                            <FuzzyMode
-                                                objectData={objectData}
-                                                factorData={factorData}
-                                                factorConnectionData={factorConnectionData}
-                                                terms={terms}
-                                                setTerms={setTerms}
-                                                termNames={termNames}
-                                                setTermNames={setTermNames}
-                                                factor={getFilteredfactorData()[currentFEditor]}
-                                                factorEvals={factorEvals}
-                                                setFactorEvals={setFactorEvals} />
-                                        </>
-                                        : <></>}
-
-                                    {method === METHODS.ACCUMULATOR ?
-                                        <>
-                                            <AccumulateFuzzyMode
-                                                objectData={objectData}
-                                                factorData={factorData}
-                                                factorConnectionData={factorConnectionData}
-                                                terms={terms}
-                                                setTerms={setTerms}
-                                                termNames={termNames}
-                                                setTermNames={setTermNames}
-                                                factor={getFilteredfactorData()[currentFEditor]}
-                                                factorEvals={factorEvals}
-                                                setFactorEvals={setFactorEvals} />
-                                        </>
-                                        : <></>}
+                                        </div> */}
+                                    </> : <></>}
+                                    { }
                                 </div>
-                                : <></>
 
-                            }
+                                {method === METHODS.CLUSTERING ?
+                                    <>
+                                        <ClusterMode
+                                            objectData={objectData}
+                                            clusters={clusters}
+                                            setClusters={setClusters}
+                                            factor={getFilteredfactorData()[currentFEditor]}
+                                            factorEvals={factorEvals}
+                                            setFactorEvals={setFactorEvals} />
+                                    </>
+                                    : <></>}
+                                {method === METHODS.FUZZY ?
+                                    <>
+                                        <FuzzyMode
+                                            objectData={objectData}
+                                            factorData={factorData}
+                                            factorConnectionData={factorConnectionData}
+                                            terms={terms}
+                                            setTerms={setTerms}
+                                            termNames={termNames}
+                                            setTermNames={setTermNames}
+                                            factor={getFilteredfactorData()[currentFEditor]}
+                                            factorEvals={factorEvals}
+                                            setFactorEvals={setFactorEvals} />
+                                    </>
+                                    : <></>}
+
+                                {method === METHODS.ACCUMULATOR ?
+                                    <>
+                                        <AccumulateFuzzyMode
+                                            objectData={objectData}
+                                            factorData={factorData}
+                                            factorConnectionData={factorConnectionData}
+                                            terms={terms}
+                                            setTerms={setTerms}
+                                            termNames={termNames}
+                                            setTermNames={setTermNames}
+                                            factor={getFilteredfactorData()[currentFEditor]}
+                                            factorEvals={factorEvals}
+                                            setFactorEvals={setFactorEvals} />
+                                    </>
+                                    : <></>}
+                            </div>
                             {factorEvals.findIndex((f) => f.id === getFilteredfactorData()[currentFEditor]?.id) >= 0 ?
                                 <>
                                     <div className="text-lg mt-4 font-bold mb-1">Получена оценка</div>
