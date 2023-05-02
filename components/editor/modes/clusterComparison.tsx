@@ -74,13 +74,17 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${negative ? "bg-blue-500" : ""}`}></div>
                 <span>Отрицательное влияние</span>
             </div>
-            <div
-                onClick={() => {
-                    getClusters()
-                }}
-                className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
-                Получить оценку
-            </div>
+
+            {factorS?.indicators.filter(i => i !== null).length && factorE?.indicators.filter(i => i !== null).length ?
+                <div
+                    onClick={() => {
+                        getClusters()
+                    }}
+                    className={`h-16 mt-2  w-20 justify-center relative noselect z-40 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                    Получить оценку
+                </div>
+                : <></>}
+
             {matrix.length ?
                 <div className="flex-col">
                     <div className="text-lg mt-4 font-bold mb-1">Таблица сравнений кластеров</div>

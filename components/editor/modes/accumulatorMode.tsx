@@ -37,6 +37,7 @@ const RegressionMode = ({ objectData, factorS, setEval, factorData }) => {
             data: {
                 fsi: fsi,
                 fei: fei,
+                iv: null,
                 outlier: outlier
             }
         })
@@ -53,6 +54,7 @@ const RegressionMode = ({ objectData, factorS, setEval, factorData }) => {
                 fei: fei,
                 reverseX,
                 reverseY,
+                iv: null,
                 outlier: outlier
             }
         })
@@ -71,6 +73,8 @@ const RegressionMode = ({ objectData, factorS, setEval, factorData }) => {
                     <div className="mt-2">Выберите выходной фактор</div>
                     <div className="mt-2">
                         {factorData.filter(f => f !== null && f?.indicators.length && f.id !== factorS.id).map((f) => {
+                            console.log("eeee")
+                            console.log(f)
                             return <div className="flex ml-2 items-center">
                                 <div
                                     onClick={() => {

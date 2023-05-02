@@ -152,15 +152,6 @@ const FactorConnectionEditor = ({
                                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.CLUSTERING ? "bg-green-500" : ""}`}></div>
                                 <span>Кластеризация</span>
                             </div>
-                            {/* <div className="flex ml-2 items-center">
-                                <div
-                                    onClick={() => {
-                                        updateExpertEvals()
-                                        setMethod(METHODS.ACCUMULATOR)
-                                    }}
-                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
-                                <span>Аккумуляция</span>
-                            </div> */}
                             <div className="flex ml-2 items-center">
                                 <div
                                     onClick={() => {
@@ -169,6 +160,15 @@ const FactorConnectionEditor = ({
                                     }}
                                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.EXPERT ? "bg-blue-500" : ""}`}></div>
                                 <span>Эксперт</span>
+                            </div>
+                            <div className="flex ml-2 items-center">
+                                <div
+                                    onClick={() => {
+                                        updateExpertEvals()
+                                        setMethod(METHODS.ACCUMULATOR)
+                                    }}
+                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
+                                <span>Аккумуляция</span>
                             </div>
 
                         </div>
