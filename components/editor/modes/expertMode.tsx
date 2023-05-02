@@ -67,7 +67,7 @@ const ExpertMode = ({ factorEvals, factorS, currentEval, setCurrentEval, setEval
                             onChange={(e) => {
                                 setCurrentEval(currentEval.map((ce, ci) => {
                                     if (ci === 0) {
-                                        return parseFloat(e.target.value)
+                                        return e.target.value
                                     }
                                     return ce
                                 }))
