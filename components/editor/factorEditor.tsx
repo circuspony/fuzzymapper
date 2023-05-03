@@ -143,7 +143,7 @@ const FactorEditor = ({
                                     </> : <></>}
                                     {getFilteredfactorData()[currentFEditor]?.indicators.filter(i => i !== null).length === 0 ? <>
 
-                                        {/* <div className="flex text-lg">
+                                        <div className="flex text-lg">
                                             <div className="flex items-center">
                                                 <div
                                                     onClick={() => {
@@ -153,7 +153,7 @@ const FactorEditor = ({
                                                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${method === METHODS.ACCUMULATOR ? "bg-blue-500" : ""}`}></div>
                                                 <span>Аккумуляция</span>
                                             </div>
-                                        </div> */}
+                                        </div>
                                     </> : <></>}
                                     { }
                                 </div>
@@ -189,7 +189,9 @@ const FactorEditor = ({
                                     <>
                                         <AccumulateFuzzyMode
                                             objectData={objectData}
+                                            setObjectData={setObjectData}
                                             factorData={factorData}
+                                            setFactorData={setFactorData}
                                             factorConnectionData={factorConnectionData}
                                             terms={terms}
                                             setTerms={setTerms}

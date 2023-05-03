@@ -17,10 +17,17 @@ const OUTLIER = {
     HIGH_OUTLIER: 2
 }
 
+const ACCUMULATION = {
+    RULEBASE: 1,
+    INDIRECT: 2,
+}
+
 const FuzzyMode = ({
     factorData,
+    setFactorData,
     factorConnectionData,
     objectData,
+    setObjectData,
     terms,
     setTerms,
     factor,
@@ -32,10 +39,14 @@ const FuzzyMode = ({
     }
 
     const [dynamic, setDynamic] = useState(false);
+    const [mode, setMode] = useState(null);
 
     useEffect(() => {
         setStep(1)
         setFunctionSets([])
+        setPredictions([])
+        setRulebase([])
+        setMode(null)
     }, [factor])
 
     const [step, setStep] = useState(1);
@@ -43,6 +54,8 @@ const FuzzyMode = ({
     const [outlier, setOutlier] = useState(false);
     const [lowOutlier, setLowOutlier] = useState("Малый выброс");
     const [highOutlier, setHighOutlier] = useState("Большой выброс");
+
+
 
     const checkExternalEvals = () => {
         let exconnected = factorConnectionData.filter(fc => fc.end === factor.id).filter(fc => getFactorById(fc.start).isExternal)
@@ -160,13 +173,24 @@ const FuzzyMode = ({
         setFactorEvals(feCopy)
     }
 
+    const addAsIndicator = async () => {
+        setStep(0)
+        setObjectData([...objectData, { date: false, key: false, title: factor.name + " предсказания", values: predictions }])
+        setFactorData(factorData.map(f => {
+            if (f?.id === factor.id) {
+                return { ...f, indicators: [{ name: factor.name + " предсказания", coef: 1 }] }
+            }
+            else return f
+
+        }))
+    }
 
     const [rulebase, setRulebase] = useState([]);
     const generateRules = () => {
         let newrulebase = []
         let allCombos = []
         let neededEvals = []
-        const currentInputs = factorConnectionData.filter(fc => fc.end === factor.id).map(fc => { return { ...fc, name: factorData.find(f => fc.start === f.id).name } })
+        const currentInputs = factorConnectionData.filter(fc => fc.end === factor.id).map(fc => { return { ...fc, name: factorData.find(f => fc.start === f?.id).name } })
         currentInputs.forEach(ci => {
             let feval = factorEvals.find(fe => fe.id === ci.start)
             neededEvals.push(feval.eLabels)
@@ -206,7 +230,7 @@ const FuzzyMode = ({
 
     const generatePredictions = async () => {
         const newData = []
-        const currentInputs = factorConnectionData.filter(fc => fc.end === factor.id).map(fc => { return { ...fc, name: factorData.find(f => fc.start === f.id).name } })
+        const currentInputs = factorConnectionData.filter(fc => fc.end === factor.id).map(fc => { return { ...fc, name: factorData.find(f => fc.start === f?.id).name } })
         currentInputs.forEach(ci => {
             let feval = factorEvals.find(fe => fe.id === ci.start)
             let fdata = factorData.find(f => f.id === ci.start)
@@ -227,162 +251,237 @@ const FuzzyMode = ({
 
     }
 
+    const generateIndirectPredictions = async () => {
+        const entryPointsConnections = factorConnectionData.filter(fc => fc?.end === factor.id)
+
+        const entryPoints = factorData.filter(f => entryPointsConnections.find(fc => fc.start === f?.id)).map(f => { return { ...f, influence: entryPointsConnections.find(fc => fc.start === f.id)?.fcEval, evals: factorEvals.find(fe => fe.id === f.id)?.labels, indicators: f.indicators.filter(i => i !== null).map((io, ii) => ({ ...io, values: objectData.find(o => o.title === io.name).values })) } })
+        const response = await backendAxios.post("/indirectacc", {
+            factors: entryPoints,
+        })
+        setPredictions(response.data.predictions)
+    }
+
     return (
         <>
-            <div
-                onClick={() => {
-                    generateRules()
-                }}
-                className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
-                Сгенерировать правила
-            </div>
-
-
-            {rulebase.length ?
+            {factor?.indicators?.length === null ?
                 <>
-                    <div className="text-lg mt-4 font-bold mb-1">Сгенерированния база правил</div>
-                    <div>{rulebase.map(r => <div>{r.text}</div>)}</div>
-                    <div
-                        onClick={() => {
-                            generatePredictions()
-                        }}
-                        className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
-                        Получить предсказания
+                    <div className="my-4">Данный модуль предназначен для получения предполагаемых значений данного фактора на основе входных факторов, имеющих индикаторы. Данный метод помогает получить оценки для всех объеков в наборе данных. Используйте модуль анализа для прогнозирования различных сценариев, возникающих при изменении состояния отдельного объекта.</div>
+                    <div className="text-lg mb-2 font-bold mb-1">Способ прогноза</div>
+
+                    <div className="flex text-lg mb-2">
+                        <div className="flex items-center">
+                            <div
+                                onClick={() => {
+                                    setMode(ACCUMULATION.INDIRECT)
+                                }}
+                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${mode === ACCUMULATION.INDIRECT ? "bg-green-500" : ""}`}></div>
+                            <span>Косвенная оценка</span>
+                        </div>
+                        <div className="flex ml-2 items-center">
+                            <div
+                                onClick={() => {
+                                    setMode(ACCUMULATION.RULEBASE)
+                                }}
+                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${mode === ACCUMULATION.RULEBASE ? "bg-violet" : ""}`}></div>
+                            <span>База правил</span>
+                        </div>
                     </div>
                 </>
                 : null}
-            {predictions.filter(i => i !== null).length && factor && checkExternalEvals() ? <>
-                <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
-                <span>Число термов</span>
-                <input
-                    value={terms}
-                    onChange={(e) => {
-                        setTerms(e.target.value.length ? parseInt(e.target.value) > 1 ? parseInt(e.target.value) : 2 : 2)
 
-                    }}
-                    style={{
-                        outline: "none",
-                    }}
-                    className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
-                />
 
-                <div className="flex items-center mt-2 ">
+            {
+                mode === ACCUMULATION.RULEBASE && factorConnectionData.filter(fc => fc.end === factor?.id && factorEvals.find(fe => fe.id === fc.start)).length ?
+                    <>
+                        <div
+                            onClick={() => {
+                                generateRules()
+                            }}
+                            className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                            Сгенерировать правила
+                        </div>
+                    </> :
+                    <></>
+            }
+            {
+                mode === ACCUMULATION.INDIRECT && factorConnectionData.filter(fc => fc.end === factor?.id && factorEvals.find(fe => fe.id === fc.start)).length ?
+                    <>
+                        <div
+                            onClick={() => {
+                                generateIndirectPredictions()
+                            }}
+                            className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                            Получить предсказания
+                        </div>
+                    </> :
+                    <></>
+            }
+
+            {
+                mode === ACCUMULATION.RULEBASE && rulebase.length ?
+                    <>
+                        <div className="text-lg mt-4 font-bold mb-1">Сгенерированния база правил</div>
+                        <div>{rulebase.map(r => <div>{r.text}</div>)}</div>
+                        <div
+                            onClick={() => {
+                                generatePredictions()
+                            }}
+                            className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                            Получить предсказания
+                        </div>
+                    </>
+                    : null
+            }
+
+            {
+                predictions.filter(i => i !== null).length && factor && checkExternalEvals() ? <>
+                    <div className="text-lg mt-4 font-bold mb-1">Параметры</div>
+                    <span>Число термов</span>
+                    <input
+                        value={terms}
+                        onChange={(e) => {
+                            setTerms(e.target.value.length ? parseInt(e.target.value) > 1 ? parseInt(e.target.value) : 2 : 2)
+
+                        }}
+                        style={{
+                            outline: "none",
+                        }}
+                        className={`text-xl p-1 w-20 border-2 border-violet-border rounded-xl bg-violet`}
+                    />
+
+                    <div className="flex items-center mt-2 ">
+                        <div
+                            onClick={() => {
+                                setOutlier(!outlier)
+                            }}
+                            className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
+                        <span>Обработать выбросы</span>
+                    </div>
+                    {objectData.filter(o => o.key).length === 1 && objectData.filter(o => o.date).length === 1 ?
+                        <>
+                            <div className="flex items-center mt-2 ">
+                                <div
+                                    onClick={() => {
+                                        setDynamic(!dynamic)
+                                    }}
+                                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${dynamic ? "bg-red-500" : ""}`}></div>
+                                <span>Обработать для динамической оценки</span>
+                            </div>
+                        </> : <></>
+                    }
                     <div
                         onClick={() => {
-                            setOutlier(!outlier)
-                        }}
-                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
-                    <span>Обработать выбросы</span>
-                </div>
-                {objectData.filter(o => o.key).length === 1 && objectData.filter(o => o.date).length === 1 ?
-                    <>
-                        <div className="flex items-center mt-2 ">
-                            <div
-                                onClick={() => {
-                                    setDynamic(!dynamic)
-                                }}
-                                className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${dynamic ? "bg-red-500" : ""}`}></div>
-                            <span>Обработать для динамической оценки</span>
-                        </div>
-                    </> : <></>
-                }
-                <div
-                    onClick={() => {
-                        setTermNames(Array.from(Array(terms).keys()))
-                        setLowOutlier("Меньше 0")
-                        setHighOutlier("Больше " + (terms - 1))
-                        setStep(2)
-                    }}
-                    className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
-                    Принять
-                </div>
-            </> : <>
-                {/* Не хватает данных для расчета
-                {checkExternalEvals() ? <></> : <div>Есть внешние факторы, которые не были оценены</div>} */}
-            </>}
-            {step >= 2 ?
-                <>
-                    <span className="mt-2">Имена термов</span>
-                    {termNames.map((t, i) =>
-                        <input
-                            key={"tinput" + i}
-                            value={t}
-                            onChange={(e) => {
-                                let newTermNames = [...termNames]
-                                newTermNames[i] = e.target.value
-                                setTermNames(newTermNames)
-
-                            }}
-                            style={{
-                                outline: "none",
-                            }}
-                            className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
-                        />
-                    )}
-
-                    {outlier ? <>
-                        <span className="mt-2">Имена категорий выбросов</span>
-                        <input
-                            key={"lotinput"}
-                            value={lowOutlier}
-                            onChange={(e) => {
-                                setLowOutlier(e.target.value)
-
-                            }}
-                            style={{
-                                outline: "none",
-                            }}
-                            className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
-                        />
-                        <input
-                            key={"hotinput"}
-                            value={highOutlier}
-                            onChange={(e) => {
-                                setHighOutlier(e.target.value)
-                            }}
-                            style={{
-                                outline: "none",
-                            }}
-                            className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
-                        />
-                    </> : <></>}
-                    <div
-                        onClick={async () => {
-                            await getExternalEvalSets()
+                            setTermNames(Array.from(Array(terms).keys()))
+                            setLowOutlier("Меньше 0")
+                            setHighOutlier("Больше " + (terms - 1))
+                            setStep(2)
                         }}
                         className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
                         Принять
                     </div>
+                </> : <>
+                    {/* Не хватает данных для расчета
+                {checkExternalEvals() ? <></> : <div>Есть внешние факторы, которые не были оценены</div>} */}
                 </>
-                : <></>}
-            {step >= 3 ?
-                <>
-                    <div className="text-lg mt-4 font-bold">Функции принадлежности</div>
-                    {
-                        readyFunctionSets.map((fs, fsi) =>
-                            <>
-                                <MembershipMode
-                                    functionSets={fs}
-                                    generateTriFunc={generateTriFunc}
-                                    generateTraFunc={generateTraFunc}
-                                    changeFs={(functionSet) => {
-                                        let newFunctionSets = [...readyFunctionSets]
-                                        newFunctionSets[fsi] = functionSet
-                                        setFunctionSets(newFunctionSets)
-                                    }}
-                                />
-                            </>)
-                    }
-                    <div
-                        onClick={() => {
-                            setStep(4)
-                            getEval()
-                        }}
-                        className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
-                        Рассчитать оценку
-                    </div>
-                </>
-                : <></>}
+            }
+            {
+                step >= 2 ?
+                    <>
+                        <span className="mt-2">Имена термов</span>
+                        {termNames.map((t, i) =>
+                            <input
+                                key={"tinput" + i}
+                                value={t}
+                                onChange={(e) => {
+                                    let newTermNames = [...termNames]
+                                    newTermNames[i] = e.target.value
+                                    setTermNames(newTermNames)
+
+                                }}
+                                style={{
+                                    outline: "none",
+                                }}
+                                className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
+                            />
+                        )}
+
+                        {outlier ? <>
+                            <span className="mt-2">Имена категорий выбросов</span>
+                            <input
+                                key={"lotinput"}
+                                value={lowOutlier}
+                                onChange={(e) => {
+                                    setLowOutlier(e.target.value)
+
+                                }}
+                                style={{
+                                    outline: "none",
+                                }}
+                                className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
+                            />
+                            <input
+                                key={"hotinput"}
+                                value={highOutlier}
+                                onChange={(e) => {
+                                    setHighOutlier(e.target.value)
+                                }}
+                                style={{
+                                    outline: "none",
+                                }}
+                                className={`text-xl  w-20 mt-2 p-1 border-2 border-violet-border rounded-xl bg-violet`}
+                            />
+                        </> : <></>}
+                        <div
+                            onClick={async () => {
+                                await getExternalEvalSets()
+                            }}
+                            className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                            Принять
+                        </div>
+                    </>
+                    : <></>
+            }
+            {
+                step >= 3 ?
+                    <>
+                        <div className="text-lg mt-4 font-bold">Функции принадлежности</div>
+                        {
+                            readyFunctionSets.map((fs, fsi) =>
+                                <>
+                                    <MembershipMode
+                                        functionSets={fs}
+                                        generateTriFunc={generateTriFunc}
+                                        generateTraFunc={generateTraFunc}
+                                        changeFs={(functionSet) => {
+                                            let newFunctionSets = [...readyFunctionSets]
+                                            newFunctionSets[fsi] = functionSet
+                                            setFunctionSets(newFunctionSets)
+                                        }}
+                                    />
+                                </>)
+                        }
+                        <div className="flex">
+                            <div
+                                onClick={() => {
+                                    setStep(4)
+                                    getEval()
+                                }}
+                                className={`h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                                Рассчитать оценку
+                            </div>
+                            <div
+                                onClick={() => {
+                                    addAsIndicator()
+                                }}
+                                className={`ml-4 h-16 mt-2  w-20 justify-center relative noselect z-30 transition-all duration-300 items-center flex w-full cursor-pointer text-white font-medium bg-violet-border border-2 border-violet border-dotted rounded-xl `}>
+                                Добавить как индикатор
+                            </div>
+
+                        </div>
+
+                    </>
+                    : <></>
+            }
             <div className="mb-4"></div>
 
         </>
