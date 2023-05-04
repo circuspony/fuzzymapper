@@ -42,7 +42,9 @@ const EditorSidebar = ({
     factorEvals,
     setCurrentFСEditor,
     currentAnalysisObject,
-    setCurrentAnalysisObject
+    setCurrentAnalysisObject,
+    setPrognosisOpen,
+    setCurrentPrognosisObject
 }) => {
 
     const getFactorById = (id) => {
@@ -133,17 +135,45 @@ const EditorSidebar = ({
             console.log(canvas.toDataURL())
         });
     }
+    // const unparseFactors = () => {
+    //     let newObjects = []
+    //     let filtered = objectData.filter(f => f.key || f.date === true)
+    //     for (let oi = 0; oi < filtered[0]?.values?.length; oi++) {
+    //         let obj = {
+    //             "Key": filtered.reduce(
+    //                 (a, c) => {
+    //                     return a + " " + c.values[oi]
+    //                 },
+    //                 ""
+    //             ).trim(),
+    //         }
+    //         factorEvals.forEach(feval => {
+    //             let factor = factorData.find(fd => fd?.id === feval.id)
+    //             if (factor) {
+    //                 obj[factor?.name] = feval.eLabels[feval.labels[oi].indexOf(Math.max(...feval.labels[oi]))]
+
+    //             }
+    //         });
+    //         newObjects.push(obj)
+    //     }
+
+    //     let csv = Papa.unparse(newObjects, { delimiter: ";" })
+    //     var encodedUri = "data:text/csv," + encodeURI(csv);
+    //     var link = document.createElement("a");
+    //     link.setAttribute("href", encodedUri);
+    //     link.setAttribute("download", "my_data.csv");
+    //     document.body.appendChild(link); // Required for FF
+
+    //     link.click(); // This will download the data file named "my_data.csv".
+    // }
     const unparseFactors = () => {
         let newObjects = []
         let filtered = objectData.filter(f => f.key || f.date === true)
         for (let oi = 0; oi < filtered[0]?.values?.length; oi++) {
+            if (filtered[1].values[oi] != 2010 && filtered[1].values[oi] != 2019 && filtered[1].values[oi] != 2020) { continue }
             let obj = {
-                "Key": filtered.reduce(
-                    (a, c) => {
-                        return a + " " + c.values[oi]
-                    },
-                    ""
-                ).trim(),
+                "Штат": filtered[0].values[oi],
+                "Год": filtered[1].values[oi]
             }
             factorEvals.forEach(feval => {
                 let factor = factorData.find(fd => fd?.id === feval.id)
@@ -267,7 +297,10 @@ const EditorSidebar = ({
                         >
                             Список связей
                         </div>
-                        <div style={{ overflowY: "scroll", height: "90%" }} className="sc flex-col">
+                        <div style={{
+                            overflowY: "scroll",
+                            // height: "90%"
+                        }} className="sc h-64 flex-col">
 
                             {factorConnectionData.filter(f => f !== null).map((fc, fсi) => {
                                 let f1 = getFactorById(fc.start)
@@ -310,6 +343,14 @@ const EditorSidebar = ({
                                     <span>{getObjectName(oi)}</span>
                                 </div>
                             )}
+                        </div>
+
+                        <div
+                            onClick={() => {
+                                setPrognosisOpen(true)
+                            }}
+                            className={`h-16 justify-center relative noselect z-40 transition-all duration-300 mt-4 items-center flex w-full cursor-pointer text-white font-medium border-2 bg-violet border-violet-border border-dotted rounded-xl `}>
+                            Прогнозирование
                         </div>
 
                     </div> : <></>}

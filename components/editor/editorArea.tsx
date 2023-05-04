@@ -13,6 +13,7 @@ import axios from 'axios'
 import IndicatorMenu from "./indicatorMenu";
 import IndicatorInfMenu from "./indicatorInfMenu";
 import IndicatorChoiceList from "./indicatorChoiceList";
+import PrognosisMenu from "./prognosisMenu";
 
 
 
@@ -42,6 +43,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
 
 
     const [dataOpen, setDataOpen] = useState(false);
+    const [prognosisOpen, setPrognosisOpen] = useState(false);
 
     const positions = [
         { x: 150, y: 0 },
@@ -430,6 +432,10 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
             setFiles(null)
         }
     }, [files])
+
+
+    const [currentPrognosisObject, setCurrentPrognosisObject] = useState(0)
+
     return (
         <>
             <EditorSidebar
@@ -461,6 +467,9 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                 objectData={objectData}
                 currentAnalysisObject={currentAnalysisObject}
                 setCurrentAnalysisObject={setCurrentAnalysisObject}
+
+                setPrognosisOpen={setPrognosisOpen}
+                setCurrentPrognosisObject={setCurrentPrognosisObject}
             />
             <div
                 id="editor"
@@ -592,6 +601,14 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                 influence={factorConnectionData[currentFactorConIndex]?.influence}
                 setInfluence={(newInfluence) => changeFactorConnectionInfluence(currentFactorConIndex, newInfluence)} />
             <DataMenu dataOpen={dataOpen} setDataOpen={setDataOpen} />
+            <PrognosisMenu
+                factorEvals={factorEvals}
+                factorData={factorData}
+                factorConnectionData={factorConnectionData}
+                modalOpen={prognosisOpen}
+                currentPrognosisObject={currentAnalysisObject}
+                objectData={objectData}
+                setModalOpen={setPrognosisOpen} />
         </>
     )
 }
