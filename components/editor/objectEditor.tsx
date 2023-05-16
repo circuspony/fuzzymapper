@@ -14,7 +14,17 @@ const ObjectEditor = ({ objectData,
     const [tempKIndex, setTempKIndex] = useState(false)
     const [tempD, setTempD] = useState(false)
     const [isField, setIsField] = useState(false)
+    const [page, setPage] = useState(0)
+    const [pageArray, setPageArray] = useState([0])
 
+    useEffect(() => {
+        console.log("objectData")
+        console.log(objectData)
+        let newPages = Math.ceil(objectData[0].values.length / 50)
+        setPage(0)
+        setPageArray(Array.from(Array(newPages).keys()))
+
+    }, [objectData])
     const editField = (i, title, key, date = false) => {
         let copy = [...objectData]
         copy[i] = {
@@ -96,27 +106,41 @@ const ObjectEditor = ({ objectData,
                         )}
                     </div>
                     {objectData[0].values.map((_, i) =>
-                        <div className="flex">
-                            <div className="w-28">{i}</div>
-                            {objectData.map((el, fi) =>
-                            (
-                                <div className="w-48 flex group mx-2">
-                                    <p>{el.values[i]}</p>
-                                    <div
-                                        onClick={() => {
-                                            setIsField(false)
-                                            setTempValue(el.values[i])
-                                            setTempIndex(i)
-                                            setTempFIndex(fi)
-                                            setValueEditorOpen(true)
-                                        }}
-                                        className={`ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark cursor-pointer `}>✎</div>
-                                </div>
-                            )
-                            )}
-                            <div
-                                onClick={() => { removeObject(i) }}
-                                className={`ml-2 transition-all cursor-pointer duration-300 text-3xl text-red-300 hover:text-violet-dark`}>🗑</div>
+                        i >= page * 50 && i < (page + 1) * 50 ?
+                            <div className="flex">
+                                <div className="w-28">{i}</div>
+                                {objectData.map((el, fi) =>
+                                (
+                                    <div className="w-48 flex group mx-2">
+                                        <p>{el.values[i]}</p>
+                                        <div
+                                            onClick={() => {
+                                                setIsField(false)
+                                                setTempValue(el.values[i])
+                                                setTempIndex(i)
+                                                setTempFIndex(fi)
+                                                setValueEditorOpen(true)
+                                            }}
+                                            className={`ml-auto opacity-0 group-hover:opacity-100 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark cursor-pointer `}>✎</div>
+                                    </div>
+                                )
+                                )}
+                                <div
+                                    onClick={() => { removeObject(i) }}
+                                    className={`ml-2 transition-all cursor-pointer duration-300 text-3xl text-red-300 hover:text-violet-dark`}>🗑</div>
+                            </div>
+                            : <></>
+
+                    )}
+                </div>
+                <div className="flex px-8 my-2 pb-4">
+                    {pageArray.map((pn, i) =>
+                        <div
+                            onClick={() => {
+                                setPage(i)
+                            }}
+                            className={`cursor-pointer mr-2 px-4 py-2 mt-2 ${page == i ? "bg-violet-dark text-white" : "text-violet-dark"}  font-bold text-xl`}>
+                            {i + 1}
                         </div>
                     )}
                 </div>
