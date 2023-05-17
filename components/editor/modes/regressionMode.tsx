@@ -47,7 +47,7 @@ const RegressionMode = ({ objectData, factorEvals, factorS, factorE, setEval }) 
                 grouping: grouping,
                 fsi: fsi,
                 fei: fei,
-                iv: factorEvals.find(fe => fe.id === factorS.id).labels,
+                iv: factorEvals.find(fe => fe.id === factorS.id)?.labels ? factorEvals.find(fe => fe.id === factorS.id)?.labels : null,
                 outlier: outlier
             }
         })
@@ -67,7 +67,7 @@ const RegressionMode = ({ objectData, factorEvals, factorS, factorE, setEval }) 
                 fei: fei,
                 reverseX,
                 reverseY,
-                iv: factorEvals.find(fe => fe.id === factorS.id).labels,
+                iv: factorEvals.find(fe => fe.id === factorS.id)?.labels ? factorEvals.find(fe => fe.id === factorS.id)?.labels : null,
                 outlier: outlier
             }
         })
@@ -111,7 +111,7 @@ const RegressionMode = ({ objectData, factorEvals, factorS, factorE, setEval }) 
                                 className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
                             <span>Обработать выбросы</span>
                         </div>
-                        {factorEvals.find(fe => fe.id === factorS.id).labels ?
+                        {factorEvals.find(fe => fe.id === factorS.id)?.labels ?
                             <div className="flex items-center mt-2 ">
                                 <div
                                     onClick={() => {
