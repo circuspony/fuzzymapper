@@ -2,17 +2,24 @@ import { useEffect, useState, useRef } from "react"
 import axios from 'axios'
 import backendAxios from '../../network/backend'
 
-
+const CMETH = {
+    CM: "CM",
+    GK: "GK"
+}
 const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE }) => {
     const [clusters, setClusters] = useState(2);
     const [matrix, setMatrix] = useState([]);
     const [outlier, setOutlier] = useState(false);
     const [negative, setNegative] = useState(false);
     const [result, setResult] = useState([]);
+    const [centers, setCenters] = useState([]);
+    const [standard, setStandard] = useState(false);
+
     useEffect(() => {
         setClusters(2)
         setMatrix([])
         setResult([])
+        setCenters([])
     }, [factorE, factorS])
 
     const getClusters = async () => {
@@ -34,6 +41,7 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
             outlier: outlier,
             cmethod: "CM"
         })
+        setCenters(response1.data.centers)
         // const responsePCA = await backendAxios.post("/pca", {
         //     data: {
         //         fsi: datafs,
@@ -53,8 +61,29 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
         setResult(response2.data.result)
         setEval(response2.data.result.map(r => negative ? -r : r))
     }
+    const [cmethod, setCmethod] = useState(CMETH.CM);
+    console.log(centers)
     return (
         <>
+            <div className="text-lg mt-4 font-bold mb-1">Метод кластеризации</div>
+            <div className="flex text-lg">
+                <div className="flex items-center">
+                    <div
+                        onClick={() => {
+                            setCmethod(CMETH.CM)
+                        }}
+                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${cmethod === CMETH.CM ? "bg-green-400" : ""}`}></div>
+                    <span>C-средние</span>
+                </div>
+                <div className="flex ml-2 items-center">
+                    <div
+                        onClick={() => {
+                            setCmethod(CMETH.GK)
+                        }}
+                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${cmethod === CMETH.GK ? "bg-green-400" : ""}`}></div>
+                    <span>ГК</span>
+                </div>
+            </div>
             <div className="text-lg mt-4 font-bold mb-1">Количество кластеров для выходного фактора</div>
             <input
                 value={clusters}
@@ -69,10 +98,27 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
             <div className="flex items-center mt-2 ">
                 <div
                     onClick={() => {
+                        setOutlier(!outlier)
+                    }}
+                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
+                <span>Обработать выбросы</span>
+            </div>
+
+            <div className="flex items-center mt-2 ">
+                <div
+                    onClick={() => {
+                        setStandard(!standard)
+                    }}
+                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${standard ? "bg-cyan-500" : ""}`}></div>
+                <span>Масштабировать</span>
+            </div>
+            <div className="flex items-center mt-2 ">
+                <div
+                    onClick={() => {
                         setNegative(!negative)
                     }}
-                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${negative ? "bg-blue-500" : ""}`}></div>
-                <span>Отрицательное влияние</span>
+                    className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${negative ? "bg-black" : ""}`}></div>
+                <span>Негативное влияние</span>
             </div>
 
             {factorS?.indicators.filter(i => i !== null).length && factorE?.indicators.filter(i => i !== null).length ?
@@ -87,13 +133,19 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
 
             {matrix.length ?
                 <div className="flex-col">
+                    <div className="text-lg mt-4 font-bold mb-1">Центры полученных кластеров</div>
+                    {centers?.map((f, i) => <>
+                        <div>
+                            <span className="font-medium mr-2">{"Кластер " + (1 + i) + ": "}</span>
+                            {f.map(el => el.toFixed(5)).join(", ")}</div>
+                    </>)}
                     <div className="text-lg mt-4 font-bold mb-1">Таблица сравнений кластеров</div>
 
                     <div className="flex">
                         <div className="font-bold items-center flex w-40 h-full">Кластер</div>
                         {
                             matrix[0].map((_, i) =>
-                                <div className="font-bold items-center flex w-40 h-full">{i}</div>
+                                <div className="font-bold items-center flex w-40 h-full">{"Кластер " + (1 + i)}</div>
 
                             )
                         }

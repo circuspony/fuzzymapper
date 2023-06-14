@@ -147,7 +147,7 @@ const MembershipMode = ({ functionSets, changeFs, generateTriFunc, generateTraFu
                         setFsType(MEMBERSHIP.TRIANGLE)
                     }}
                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${fsType === MEMBERSHIP.TRIANGLE ? "bg-green-500" : ""}`}></div>
-                <span>Триугольная</span>
+                <span>Треугольная</span>
             </div>
             <div className="flex items-center mt-2 ">
                 <div

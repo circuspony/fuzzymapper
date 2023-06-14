@@ -14,13 +14,15 @@ import IndicatorMenu from "./indicatorMenu";
 import IndicatorInfMenu from "./indicatorInfMenu";
 import IndicatorChoiceList from "./indicatorChoiceList";
 import PrognosisMenu from "./prognosisMenu";
-
+import HierarchyEditor from "./hierarchyEditor";
+import { v4 as uuidv4 } from 'uuid';
 
 
 const EDITOR_WINDOWS = {
     GRAPH: "graph",
     OBJECTS: "objects",
     FACTORS: "factors",
+    HIERARCHY: "hierarchy",
     CONNECTIONS: "connections",
     ANALYSIS: "analysis",
 }
@@ -56,7 +58,8 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
 
     const addFactor = (event) => {
         const newData = {
-            id: "factor" + uniqueCreationNumber,
+            // id: "factor" + uniqueCreationNumber,
+            id: uuidv4(),
             name: "Новый Фактор",
             isNew: true,
             isExternal: false,
@@ -393,14 +396,11 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         input.value = null
     };
     const exportFile = async () => {
-        const savingData = getSavingData()
+        saveOldHierarchy()
         let myData = {
-            factors: savingData,
             idGen: uniqueCreationNumber,
-            connections: factorConnectionData,
-            factorEvals: factorEvals,
-            factorConnectionEvals: factorConnectionEvals,
-            objectData: objectData
+            objectData: objectData,
+            hierarchy: hierarchy
         }
         const fileName = "mapFile";
         const json = JSON.stringify(myData, null, 2);
@@ -422,12 +422,14 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         if (files?.length) {
             const loadedFile = JSON.parse(files)
             if (loadedFile) {
-                setFactorData(loadedFile.factors)
-                setFactorConnectionData(loadedFile.connections)
+                setFactorData(loadedFile.hierarchy[0].factors)
+                setFactorConnectionData(loadedFile.hierarchy[0].connections)
                 setUniqueCreationNumber(loadedFile.idGen)
-                setFactorEvals(loadedFile.factorEvals)
-                setFactorConnectionEvals(loadedFile.factorConnectionEvals)
+                setFactorEvals(loadedFile.hierarchy[0].fEvals)
+                setFactorConnectionEvals(loadedFile.hierarchy[0].fcEvals)
                 setObjectData(loadedFile.objectData)
+                setHierarchy(loadedFile.hierarchy)
+                setCurrentHierarchy(0)
             }
             setFiles(null)
         }
@@ -436,6 +438,73 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
 
     const [currentPrognosisObject, setCurrentPrognosisObject] = useState(0)
 
+    const [hierarchy, setHierarchy] = useState([{
+        name: "Главная карта",
+        factors: [],
+        connections: [],
+        fEvals: [],
+        fcEvals: [],
+        parent: null,
+        factorId: null
+    }])
+    const saveOldHierarchy = () => {
+        setHierarchy(hierarchy.map((h, hi) => {
+            if (hi === currentHierarchy) {
+
+                let newH = { ...h, factors: getSavingData() }
+                return newH
+            }
+            else return h
+        }))
+    }
+    const addToHierarchy = (factor) => {
+        setHierarchy([...hierarchy, {
+            name: factor.name,
+            factors: [],
+            connections: [],
+            fEvals: [],
+            fcEvals: [],
+            parent: hierarchy[currentHierarchy].name,
+            factorId: factor.id
+        }])
+    }
+
+    const [currentHierarchy, setCurrentHierarchy] = useState(0)
+    useEffect(() => {
+        setHierarchy(hierarchy.map((h, i) => {
+            if (i === currentHierarchy) {
+                let newH = { ...h, factors: factorData, connections: factorConnectionData, fEvals: factorEvals, fcEvals: factorConnectionEvals }
+                return newH
+
+            }
+            else return h
+        }))
+    }, [factorData, factorConnectionData, factorConnectionEvals, factorEvals])
+
+    useEffect(() => {
+        let ch = hierarchy[currentHierarchy]
+        let timer1 = null
+        if (ch) {
+            setFactorData([])
+            setFactorConnectionData([])
+            setFactorEvals([])
+            setFactorConnectionEvals([])
+            timer1 = setTimeout(() => {
+                setFactorData(ch.factors)
+                setFactorConnectionData(ch.connections)
+                setFactorEvals(ch.fEvals)
+                setFactorConnectionEvals(ch.fcEvals)
+            }, 100)
+        }
+        return () => {
+            clearTimeout(timer1)
+        }
+    }, [currentHierarchy])
+
+    console.log("factorData")
+    console.log(uniqueCreationNumber)
+    console.log(hierarchy)
+    console.log(currentHierarchy)
     return (
         <>
             <EditorSidebar
@@ -503,6 +572,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                                 setIndicatorInfMenuOpen={setIndicatorInfMenuOpen}
                                 setCurrentFInddicatorIndex={setCurrentFInddicatorIndex}
                                 setCurrentInddicatorIndex={setCurrentInddicatorIndex}
+                                addToHierarchy={addToHierarchy}
                             />)}
                         {factorConnectionData.map((factorConnection, index) =>
                             <>
@@ -537,6 +607,16 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
                     setFactorEvals={setFactorEvals}
                     factorConnectionEvals={factorConnectionEvals}
                     setFactorConnectionEvals={setFactorConnectionEvals}
+                />
+            </div>
+            <div
+                className={`${currentWindow === EDITOR_WINDOWS.HIERARCHY ? "flex w-full sc overflow-scroll" : "hidden"}`}>
+                <HierarchyEditor
+                    hierarchy={hierarchy}
+                    setHierarchy={setHierarchy}
+                    currentHierarchy={currentHierarchy}
+                    setCurrentHierarchy={setCurrentHierarchy}
+                    saveOldHierarchy={saveOldHierarchy}
                 />
             </div>
             <div

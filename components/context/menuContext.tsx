@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState, useReducer } from "react";
 
 
 const EDITOR_WINDOWS = {
@@ -22,6 +22,11 @@ const MenuContext = React.createContext({
     setCurrentFСEditor: null,
     currentAnalysisObject: 0,
     setCurrentAnalysisObject: null,
+    reducerState: {
+        objectData: [],
+        hierarchy: []
+    },
+    reducerDispatch: null,
 });
 
 
@@ -37,6 +42,29 @@ const MenuContextProvider = ({ children }: Props) => {
     const [currentFEditor, setCurrentFEditor] = useState(0)
     const [currentFСEditor, setCurrentFСEditor] = useState(0)
     const [currentAnalysisObject, setCurrentAnalysisObject] = useState(0)
+    const reducer = (state, action) => {
+        switch (action.type) {
+            case 'changeHierarchy': {
+                return {
+                    ...state,
+                    hierarchy: action.hierarchy,
+                };
+            }
+            case 'changeObjectData': {
+                return {
+                    ...state,
+                    objectData: action.objectData,
+                };
+            }
+        }
+        throw Error('Unknown action: ' + action.type);
+    }
+
+    const [reducerState, reducerDispatch] = useReducer(reducer as any, {
+        objectData: [],
+        hierarchy: []
+    }) as any
+
     return (
         <MenuContext.Provider
             value={{
@@ -51,7 +79,9 @@ const MenuContextProvider = ({ children }: Props) => {
                 currentFСEditor,
                 setCurrentFСEditor,
                 currentAnalysisObject,
-                setCurrentAnalysisObject
+                setCurrentAnalysisObject,
+                reducerState,
+                reducerDispatch
             }}
         >
             {children}

@@ -15,6 +15,7 @@ const ClusterMode = ({
     factorEvals,
     setFactorEvals, }) => {
     const [outlier, setOutlier] = useState(false);
+    const [standard, setStandard] = useState(false);
     const [cmethod, setCmethod] = useState(CMETH.CM);
 
     const formatEvalsWithIndicatorsClusters = (labels, indicators) => {
@@ -111,6 +112,14 @@ const ClusterMode = ({
                         className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${outlier ? "bg-blue-500" : ""}`}></div>
                     <span>Обработать выбросы</span>
                 </div>
+                <div className="flex items-center mt-2 ">
+                    <div
+                        onClick={() => {
+                            setStandard(!standard)
+                        }}
+                        className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${standard ? "bg-cyan-500" : ""}`}></div>
+                    <span>Масштабировать</span>
+                </div>
                 <div
                     onClick={() => {
                         getClusters()
@@ -123,7 +132,7 @@ const ClusterMode = ({
                 <>
                     <div className="text-lg mt-4 font-bold mb-1">Центры полученных кластеров</div>
                     {factorEvals.find((f) => f.id === factor.id).centers?.map(f => <>
-                        <div>{f.join(", ")}</div>
+                        <div>{f.map(el => el.toFixed(5)).join(", ")}</div>
                     </>)}
                     <div className="text-lg mt-4 font-bold mb-1">Назначьте названия кластеров</div>
                     {factorEvals.find((f) => f.id === factor.id).eLabels.map((f, i) => <>

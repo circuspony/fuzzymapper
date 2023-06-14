@@ -25,6 +25,7 @@ const FactorObject = ({
     setIndicatorInfMenuOpen,
     setCurrentFInddicatorIndex,
     setCurrentInddicatorIndex,
+    addToHierarchy
 
 }) => {
     if (factorData === null) return null
@@ -108,16 +109,13 @@ const FactorObject = ({
                             className={`ml-1 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark`}>
                             Ⓘ
                         </div>
-                        {/* {!isSubMap ?
-                            <div
-                                onClick={() => {
-                                    openASubMap(id)
-                                }}
-                                className={`ml-1 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark`}>
-                                ⭖
-                            </div>
-                            : <></>
-                        } */}
+                        <div
+                            onClick={() => {
+                                addToHierarchy(factorData)
+                            }}
+                            className={`ml-1 transition-all duration-300 text-3xl text-blue-300 hover:text-violet-dark`}>
+                            ⭖
+                        </div>
                         <div
                             onClick={removeFactorData}
                             className={`ml-auto transition-all duration-300 text-3xl text-red-300 hover:text-violet-dark`}>🗑</div>
