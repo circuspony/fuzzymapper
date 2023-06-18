@@ -39,7 +39,8 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
             clusters: clusters,
             data: data,
             outlier: outlier,
-            cmethod: "CM"
+            standard: standard,
+            cmethod: cmethod
         })
         setCenters(response1.data.centers)
         // const responsePCA = await backendAxios.post("/pca", {
@@ -112,16 +113,16 @@ const ClusterComparison = ({ setEval, objectData, factorEvals, factorS, factorE 
                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${standard ? "bg-cyan-500" : ""}`}></div>
                 <span>Масштабировать</span>
             </div>
-            <div className="flex items-center mt-2 ">
+            {/* <div className="flex items-center mt-2 ">
                 <div
                     onClick={() => {
                         setNegative(!negative)
                     }}
                     className={`h-8 w-8 mr-1 border-dotted border-2 border-violet-border border-dotted rounded-md cursor-pointer ${negative ? "bg-black" : ""}`}></div>
                 <span>Негативное влияние</span>
-            </div>
+            </div> */}
 
-            {factorS?.indicators.filter(i => i !== null).length && factorE?.indicators.filter(i => i !== null).length ?
+            {factorS?.indicators.filter(i => i !== null).length && factorE?.indicators.filter(i => i !== null).length && factorEvals.find(fe => fe.id === factorS.id)?.labels ?
                 <div
                     onClick={() => {
                         getClusters()

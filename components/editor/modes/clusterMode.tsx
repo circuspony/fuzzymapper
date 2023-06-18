@@ -48,6 +48,7 @@ const ClusterMode = ({
             clusters: clusters,
             data: data,
             outlier: outlier,
+            standard: standard,
             cmethod: cmethod
         })
         const updateData = {
@@ -131,9 +132,11 @@ const ClusterMode = ({
             {factorEvals.findIndex((f) => f.id === factor.id) >= 0 && factorEvals.find((f) => f.id === factor.id).centers?.length ?
                 <>
                     <div className="text-lg mt-4 font-bold mb-1">Центры полученных кластеров</div>
-                    {factorEvals.find((f) => f.id === factor.id).centers?.map(f => <>
+                    {factorEvals.find((f) => f.id === factor.id).centers?.map((f, i) => <div className="flex">
+                        <span className="font-medium mr-2">{"Кластер " + (1 + i) + ": "}</span>
+
                         <div>{f.map(el => el.toFixed(5)).join(", ")}</div>
-                    </>)}
+                    </div>)}
                     <div className="text-lg mt-4 font-bold mb-1">Назначьте названия кластеров</div>
                     {factorEvals.find((f) => f.id === factor.id).eLabels.map((f, i) => <>
                         <input

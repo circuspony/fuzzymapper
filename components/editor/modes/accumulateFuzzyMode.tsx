@@ -291,7 +291,7 @@ const FuzzyMode = ({
 
 
             {
-                mode === ACCUMULATION.RULEBASE && factorConnectionData.filter(fc => fc.end === factor?.id && factorEvals.find(fe => fe.id === fc.start)).length ?
+                mode === ACCUMULATION.RULEBASE && factorConnectionData.filter(fc => fc?.fcEval.length && fc.end === factor?.id && factorEvals.find(fe => fe.id === fc.start)).length ?
                     <>
                         <div
                             onClick={() => {
@@ -304,7 +304,7 @@ const FuzzyMode = ({
                     <></>
             }
             {
-                mode === ACCUMULATION.INDIRECT && factorConnectionData.filter(fc => fc.end === factor?.id && factorEvals.find(fe => fe.id === fc.start)).length ?
+                mode === ACCUMULATION.INDIRECT && factorConnectionData.filter(fc => fc?.fcEval.length && fc.end === factor?.id && factorEvals.find(fe => fe.id === fc.start)).length ?
                     <>
                         <div
                             onClick={() => {
