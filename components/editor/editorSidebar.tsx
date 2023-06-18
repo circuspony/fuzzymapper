@@ -246,6 +246,25 @@ const EditorSidebar = ({
 
         link.click(); // This will download the data file named "my_data.csv".
     }
+
+    const unparseObjectData = () => {
+        let newObjects = []
+        for (let oi = 0; oi < objectData[0]?.values?.length; oi++) {
+            let obj = {}
+            for (let oii = 0; oii < objectData?.length; oii++) {
+                obj[objectData[oii].title] = objectData[oii].values[oi]
+            }
+            newObjects.push(obj)
+        }
+        let csv = Papa.unparse(newObjects, { delimiter: ";", header: true, })
+        var encodedUri = "data:text/csv," + encodeURI('\ufeff' + csv);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link)
+
+        link.click()
+    }
     return (
         <>
 
@@ -333,7 +352,7 @@ const EditorSidebar = ({
 
                         <div
                             onClick={() => {
-                                document.getElementById("csvInput").click()
+                                unparseObjectData()
                             }}
                             className="mx-auto mt-1 font-medium hover:cursor-pointer hover:text-yellow-500"
                         >
