@@ -25,19 +25,25 @@ export default function Home() {
         load()
     }, [])
     return (
-        <div
-            className={`w-full h-screen flex`}>
-            <EditorArea isSubMap={isSubMap} seIsSubMap={seIsSubMap} />
-            <ModalOverlay canClose={false} classes="flex" modalOpen={modalOpen} setModalOpen={setModalOpen}>
-                <div className="my-auto flex flex-col mx-auto p-8 w-2/5 border-2 border-violet border-dotted bg-violet-light rounded-xl">
-                    <div className="text-violet-border text-2xl font-medium mb-2 mx-auto">
-                        Ждем ответ от сервера
-                        <Loader />
+        <>
+            <div className="w-full h-full flex md:hidden flex-col  bg-violet py-9 px-4 items-center">
+                <div className="text-xl font-bold">Извините!</div>
+                <div className="text-lg text-center">На данный момент работа с мобильных устройств не поддерживается.</div>
+            </div>
+            <div
+                className={`w-full h-screen hidden md:flex`}>
+                <EditorArea isSubMap={isSubMap} seIsSubMap={seIsSubMap} />
+                <ModalOverlay canClose={false} classes="flex" modalOpen={modalOpen} setModalOpen={setModalOpen}>
+                    <div className="my-auto flex flex-col mx-auto p-8 w-2/5 border-2 border-violet border-dotted bg-violet-light rounded-xl">
+                        <div className="text-violet-border text-2xl font-medium mb-2 mx-auto">
+                            Ждем ответ от сервера
+                            <Loader />
+                        </div>
+
                     </div>
 
-                </div>
-
-            </ModalOverlay>
-        </div>
+                </ModalOverlay>
+            </div>
+        </>
     )
 }

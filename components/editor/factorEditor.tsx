@@ -87,7 +87,7 @@ const FactorEditor = ({
                                     )}
                                 </> :
                                 <></>}
-                            <div className="text-lg mt-4 font-bold mb-1">Вид фактора</div>
+                            <div className="text-lg mt-4 font-bold mb-1">Тип фактора</div>
                             <div className="flex text-lg">
                                 <div className="flex items-center">
                                     <div

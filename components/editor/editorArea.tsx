@@ -400,7 +400,14 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
         let myData = {
             idGen: uniqueCreationNumber,
             objectData: objectData,
-            hierarchy: hierarchy
+            hierarchy: hierarchy.map((h, hi) => {
+                if (hi === currentHierarchy) {
+
+                    let newH = { ...h, factors: getSavingData() }
+                    return newH
+                }
+                else return h
+            })
         }
         const fileName = "mapFile";
         const json = JSON.stringify(myData, null, 2);
@@ -439,6 +446,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
     const [currentPrognosisObject, setCurrentPrognosisObject] = useState(0)
 
     const [hierarchy, setHierarchy] = useState([{
+        id: uuidv4(),
         name: "Главная карта",
         factors: [],
         connections: [],
@@ -459,6 +467,7 @@ const EditorArea = ({ isSubMap, seIsSubMap }) => {
     }
     const addToHierarchy = (factor) => {
         setHierarchy([...hierarchy, {
+            id: uuidv4(),
             name: factor.name,
             factors: [],
             connections: [],
